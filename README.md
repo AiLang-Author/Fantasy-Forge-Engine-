@@ -43,10 +43,9 @@ A fully data-driven, open-source RPG engine inspired by Dragon Quest and tableto
 
 ## Prerequisites
 
-- [Ailang Project](https://github.com/AiLang-Author/AiLang)
 - [AILang compiler](https://github.com/AiLang-Author/AiLang/tree/master/ailang)
 - Python 3.x (to run compiler)
-- Linux (x86-64) ailang make use of syscalls, has it's own memory model and leverage pure kernel resources no external depdencys !
+- Linux (x86-64)
 
 ## Build & Run
 
@@ -158,6 +157,20 @@ Fantasy-Forge-Engine-/
 └── dnd/
     └── ailang/
         ├── dnd.ailang              # Main entry point
+        ├── Library.DND.ailang      # Core game engine
+        ├── Library.TUI.ailang      # Terminal rendering
+        ├── Library.DICE.ailang     # RNG and dice rolls
+        ├── Library.Character.ailang
+        ├── Library.Item.ailang
+        ├── Library.Shop.ailang
+        ├── Library.Inn.ailang
+        ├── Library.Save.ailang
+        ├── Library.SaveScreen.ailang
+        ├── Library.World.ailang
+        ├── Library.GameConfig.ailang
+        ├── Library.Encounter.ailang
+        ├── Library.BattleScreen.ailang
+        ├── Library.EquipScreen.ailang
         ├── data/
         │   ├── game.dndconf        # Demo world config
         │   ├── items.dnddat
@@ -171,25 +184,9 @@ Fantasy-Forge-Engine-/
         │   └── dungeon1.dndmap
         ├── saves/
         └── docs/
-        |   ├── DATA_FORMATS.md
-        |   ├── SAVE_SYSTEM.md
-        |   └── NETWORK_ARCHITECTURE.md
-        |
-        |_Librarys
-            ├── Library.DND.ailang      # Core game engine
-            ├── Library.TUI.ailang      # Terminal rendering
-            ├── Library.DICE.ailang     # RNG and dice rolls
-            ├── Library.Character.ailang
-            ├── Library.Item.ailang
-            ├── Library.Shop.ailang
-            ├── Library.Inn.ailang
-            ├── Library.Save.ailang
-            ├── Library.SaveScreen.ailang
-            ├── Library.World.ailang
-            ├── Library.GameConfig.ailang
-            ├── Library.Encounter.ailang
-            ├── Library.BattleScreen.ailang
-            ├── Library.EquipScreen.ailang
+            ├── DATA_FORMATS.md
+            ├── SAVE_SYSTEM.md
+            └── NETWORK_ARCHITECTURE.md
 ```
 
 ## Roadmap
@@ -241,10 +238,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Documentation
 
-- [Data Formats & Modding Guide](docs/DATA_FORMATS.md)
-- [Save System](docs/SAVE_SYSTEM.md)
-- [Network Architecture](docs/NETWORK_ARCHITECTURE.md)
-- [Project Roadmap](docs/PROJECT_ROADMAP.md)
+- [Developer Onboarding Guide](ONBOARDING.md) — Quick start, architecture, common tasks
+- [Data Formats & Modding Guide](DATA_FORMATS.md) — File specs for maps, items, monsters, etc.
+- [Library API Reference](LIBRARY_REFERENCE.md) — Full function reference for all libraries
+- [Save System](SAVE_SYSTEM.md) — Save/load, quest flags, checkpoints
+- [Network Architecture](NETWORK_ARCHITECTURE.md) — Multiplayer design (planned)
+- [Project Roadmap](PROJECT_ROADMAP.md) — Current status and future plans
 
 ## License
 
