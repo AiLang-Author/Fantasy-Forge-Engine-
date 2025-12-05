@@ -1,0 +1,550 @@
+# Fantasy Forge Engine - Save System Documentation
+
+## Overview
+
+Dragon Quest-style save system with inn checkpoints, party support, and quest flags. Designed for single-player with multiplayer expansion in mind.
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **3 Save Slots** | Each with preview (character, level, gold, location, playtime) |
+| **Party Support** | Save up to 4 characters with full stats |
+| **Inn Checkpoints** | Rest and save at inns, respawn there on death |
+| **Quest Flags** | 64 persistent flags for quest state |
+| **Human-Readable** | INI-like `.dndsav` format for debugging/modding |
+| **Checksum** | XOR-based integrity validation |
+| **Playtime** | Tracks seconds played, displays as hours in UI |
+
+---
+
+## Libraries
+
+### Library.Save.ailang
+
+Core save/load functionality.
+
+#### Initialization
+
+```ailang
+Save_Init()              // Allocate buffers, load slot info
+Save_Cleanup()           // Free all save system memory
+```
+
+#### Single Player Save/Load
+
+```ailang
+// Save current game
+result = Save_GameSingle(slot, char_data, x, y, map_id, gold, location_name)
+// Returns: 0 on success, negative on error
+
+// Load saved game
+result = Save_LoadSingle(slot, 
+                         AddressOf(char_data),
+                         AddressOf(x), 
+                         AddressOf(y), 
+                         AddressOf(map_id), 
+                         AddressOf(gold))
+// Returns: 0 on success, negative on error
+```
+
+#### Party Save/Load (Multiplayer-Ready)
+
+```ailang
+// Save party game
+result = Save_Game(slot, party_array, party_count, x, y, map_id, gold, location)
+// party_array: array of character data pointers
+
+// Load party game
+result = Save_Load(slot, 
+                   party_array,           // Output: populated with char pointers
+                   AddressOf(party_count),
+                   AddressOf(x), 
+                   AddressOf(y), 
+                   AddressOf(map_id), 
+                   AddressOf(gold))
+```
+
+#### Quick Save (Development)
+
+```ailang
+// Quick save to slot 0
+Save_QuickSave(char_data, x, y, map_id, gold)
+
+// Quick load from slot 0
+Save_QuickLoad(AddressOf(char_data), AddressOf(x), AddressOf(y), 
+               AddressOf(map_id), AddressOf(gold))
+```
+
+#### Quest Flags
+
+```ailang
+// Set a quest flag (persisted in save file)
+Save_SetFlag("quest_dragon", 1)
+Save_SetFlag("met_king", 1)
+Save_SetFlag("cave_unlocked", 1)
+
+// Get a quest flag (returns 0 if not set)
+value = Save_GetFlag("quest_dragon")
+
+// Use in conditions
+IfCondition EqualTo(Save_GetFlag("quest_dragon"), 1) ThenBlock: {
+    // Dragon quest is active
+}
+```
+
+#### Inn Checkpoints
+
+```ailang
+// Set respawn point (called when resting at inn)
+Save_SetInnCheckpoint(map_id, x, y)
+
+// Get respawn point (called on death)
+Save_GetInnCheckpoint(AddressOf(map_id), AddressOf(x), AddressOf(y))
+```
+
+#### Utilities
+
+```ailang
+// Check if slot has save data
+exists = Save_SlotExists(slot)  // Returns 0 or 1
+
+// Delete a save slot
+Save_DeleteSlot(slot)
+
+// Add playtime (call periodically or on save)
+Save_AddPlaytime(seconds)
+```
+
+---
+
+### Library.SaveScreen.ailang
+
+TUI-based save/load interface with slot preview.
+
+#### Save Interface
+
+```ailang
+// Show save screen, returns selected slot or -1 if cancelled
+slot = SaveScreen_Save(char_data, x, y, map_id, gold, location_name)
+
+// Party version
+slot = SaveScreen_SaveParty(party_array, party_count, x, y, map_id, gold, location)
+```
+
+#### Load Interface
+
+```ailang
+// Show load screen from gameplay
+slot = SaveScreen_Load(AddressOf(char_data), 
+                       AddressOf(x), AddressOf(y),
+                       AddressOf(map_id), AddressOf(gold))
+
+// Show load screen from title (slightly different UI)
+slot = SaveScreen_TitleLoad(AddressOf(char_data),
+                            AddressOf(x), AddressOf(y),
+                            AddressOf(map_id), AddressOf(gold))
+```
+
+#### Slot Preview Display
+
+```
+┌─────────────────────────────────────┐
+│ SLOT 1                              │
+│ Aldric  Lv.7  Warrior               │
+│ Gold: 1,250   Playtime: 2:01        │
+│ Location: Goblin Cave B1            │
+├─────────────────────────────────────┤
+│ SLOT 2                              │
+│ -- Empty --                         │
+├─────────────────────────────────────┤
+│ SLOT 3                              │
+│ Lyra    Lv.3  Mage                  │
+│ Gold: 340     Playtime: 0:45        │
+│ Location: Starter Town              │
+└─────────────────────────────────────┘
+```
+
+---
+
+## File Format (.dndsav)
+
+Human-readable INI-like format for easy debugging and modding.
+
+```ini
+# ============================================
+# Fantasy Forge Engine - Save File
+# ============================================
+
+[HEADER]
+VERSION=1
+SLOT=0
+PLAYTIME=7245              # Total seconds played
+
+[WORLD]
+MAP_ID=2                   # Current map
+PLAYER_X=15
+PLAYER_Y=8
+INN_MAP=1                  # Respawn location
+INN_X=4
+INN_Y=3
+
+[PARTY]
+COUNT=2                    # 1-4 party members
+GOLD=1250
+
+[CHAR:0]                   # Lead character
+NAME=Aldric
+CLASS=1                    # 1=Warrior, 2=Mage, 3=Rogue, 4=Cleric, 5=Ranger
+LEVEL=7
+XP=2450
+HP=45
+MAX_HP=52
+MP=12
+MAX_MP=20
+STR=18
+AGI=12
+VIT=15
+INT=10
+LUK=11
+SKILLS=7                   # Bitmask of learned skills
+
+[CHAR:1]                   # Second party member
+NAME=Lyra
+CLASS=2
+LEVEL=6
+XP=1980
+HP=28
+MAX_HP=32
+MP=45
+MAX_MP=58
+STR=8
+AGI=14
+VIT=9
+INT=22
+LUK=13
+SKILLS=14
+
+[INVENTORY]
+COUNT=8
+ITEM_0=60,5                # item_id,quantity
+ITEM_1=61,3
+ITEM_2=63,2
+ITEM_3=80,10
+ITEM_4=70,1
+ITEM_5=3,1
+ITEM_6=12,1
+ITEM_7=22,1
+
+[EQUIPMENT]
+SLOT_0=3                   # Weapon
+SLOT_1=12                  # Armor
+SLOT_2=22                  # Shield
+SLOT_3=31                  # Helmet
+SLOT_4=0                   # Ring (0 = empty)
+SLOT_5=0                   # Amulet
+
+[FLAGS]
+COUNT=4
+quest_dragon=1
+met_king=1
+cave_unlocked=1
+rescued_villager=0
+
+[CHECKSUM]
+VALUE=48291573             # XOR-based integrity check
+```
+
+### Section Reference
+
+| Section | Description |
+|---------|-------------|
+| `[HEADER]` | Save metadata (version, slot, playtime) |
+| `[WORLD]` | Player position and respawn checkpoint |
+| `[PARTY]` | Party size and shared gold |
+| `[CHAR:N]` | Character N's stats (0 = lead, 1-3 = party) |
+| `[INVENTORY]` | Shared inventory items |
+| `[EQUIPMENT]` | Lead character's equipment slots |
+| `[FLAGS]` | Quest and event flags |
+| `[CHECKSUM]` | Data integrity validation |
+
+---
+
+## Integration Examples
+
+### Title Screen with Continue
+
+```ailang
+Function.ShowTitleScreen {
+    Body: {
+        // ... draw title ...
+        
+        choice = 0  // 0=New, 1=Continue, 2=Quit
+        
+        // Check if any saves exist
+        has_saves = Or(Save_SlotExists(0), 
+                      Or(Save_SlotExists(1), Save_SlotExists(2)))
+        
+        // Handle selection
+        IfCondition EqualTo(choice, 1) ThenBlock: {
+            // Continue - show load screen
+            slot = SaveScreen_TitleLoad(AddressOf(char_data),
+                                        AddressOf(x), AddressOf(y),
+                                        AddressOf(map), AddressOf(gold))
+            IfCondition GreaterEqual(slot, 0) ThenBlock: {
+                DND_Player.char_data = char_data
+                DND_Player.x = x
+                DND_Player.y = y
+                DND_Player.gold = gold
+                DND_LoadMap(map)
+            }
+        }
+    }
+}
+```
+
+### Inn Interaction
+
+```ailang
+Function.DND_HandleInn {
+    Input: x: Integer
+    Input: y: Integer
+    Body: {
+        inn_id = Inn_GetAtPosition(DND_Map.level, x, y)
+        IfCondition GreaterEqual(inn_id, 0) ThenBlock: {
+            Inn_ShowMenu_v2(inn_id, 
+                           DND_Player.char_data,
+                           0,                      // party array (null for single)
+                           1,                      // party count
+                           AddressOf(DND_Player.gold),
+                           DND_Player.x,
+                           DND_Player.y,
+                           DND_Map.level)
+        }
+    }
+}
+```
+
+### Death and Respawn
+
+```ailang
+Function.DND_HandleDeath {
+    Body: {
+        // Show death screen with options
+        choice = DND_ShowDeathMenu()  // 0=Load, 1=Respawn, 2=Quit
+        
+        IfCondition EqualTo(choice, 0) ThenBlock: {
+            // Load last save
+            DND_TryLoadSave()
+        }
+        
+        IfCondition EqualTo(choice, 1) ThenBlock: {
+            // Respawn at last inn
+            DND_RespawnAtInn()
+        }
+        
+        IfCondition EqualTo(choice, 2) ThenBlock: {
+            DND_GameState.running = 0
+        }
+    }
+}
+
+Function.DND_RespawnAtInn {
+    Body: {
+        map_id = 0
+        x = 0
+        y = 0
+        
+        // Get checkpoint (set when resting at inn)
+        Save_GetInnCheckpoint(AddressOf(map_id), AddressOf(x), AddressOf(y))
+        
+        // Default if no checkpoint
+        IfCondition And(EqualTo(x, 0), EqualTo(y, 0)) ThenBlock: {
+            map_id = 1   // Hometown
+            x = 5
+            y = 14
+        }
+        
+        // Revive with 1 HP (Dragon Quest style)
+        Char_SetStat16(DND_Player.char_data, Char_Offsets.HP, 1)
+        
+        // Lose half gold (death penalty)
+        DND_Player.gold = Divide(DND_Player.gold, 2)
+        
+        // Teleport to inn
+        DND_Player.x = x
+        DND_Player.y = y
+        DND_LoadMap(map_id)
+        
+        DND_AddMessage("You wake at the inn...")
+        DND_AddMessage("You lost half your gold!")
+    }
+}
+```
+
+### Quest Flag Usage
+
+```ailang
+// In dialogue/event handler
+Function.HandleKingDialogue {
+    Body: {
+        IfCondition EqualTo(Save_GetFlag("met_king"), 0) ThenBlock: {
+            // First meeting
+            DND_ShowDialogue("Welcome, brave adventurer!")
+            DND_ShowDialogue("Our kingdom needs your help.")
+            Save_SetFlag("met_king", 1)
+            Save_SetFlag("quest_dragon", 1)
+            Item_InvAdd(60, 5)  // Give 5 health potions
+            DND_AddMessage("Received 5 Health Potions!")
+        } ElseBlock: {
+            // Already met
+            IfCondition EqualTo(Save_GetFlag("quest_dragon"), 1) ThenBlock: {
+                DND_ShowDialogue("Have you defeated the dragon yet?")
+            } ElseBlock: {
+                DND_ShowDialogue("Thank you for saving our kingdom!")
+            }
+        }
+    }
+}
+
+// After defeating dragon boss
+Function.OnDragonDefeated {
+    Body: {
+        Save_SetFlag("quest_dragon", 0)  // Quest complete
+        Save_SetFlag("dragon_killed", 1)
+        DND_Player.gold = Add(DND_Player.gold, 1000)  // Reward
+        DND_AddMessage("Quest Complete! Received 1000 gold!")
+    }
+}
+```
+
+---
+
+## Memory Layout
+
+### Slot Info Structure (64 bytes per slot)
+
+```
+Offset | Size | Field
+-------|------|-------
+0      | 1    | Used flag (0/1)
+1      | 1    | Party size
+2      | 2    | Hours played
+4      | 2    | Lead character level
+6      | 4    | Gold
+10     | 1    | Map ID
+11     | 32   | Lead character name
+43     | 20   | Location name
+63     | 1    | Reserved
+```
+
+### Flag Structure (36 bytes per flag)
+
+```
+Offset | Size | Field
+-------|------|-------
+0      | 32   | Flag name (null-terminated)
+32     | 4    | Flag value
+```
+
+### Save Buffer
+
+```ailang
+FixedPool.Save_Buffer {
+    "data": Initialize=0      // 8KB buffer
+    "pos": Initialize=0       // Current write position
+}
+
+FixedPool.Save_Limits {
+    "MAX_SLOTS": Initialize=3
+    "MAX_PARTY": Initialize=4
+    "MAX_FLAGS": Initialize=64
+    "BUFFER_SIZE": Initialize=8192
+}
+```
+
+---
+
+## Checksum Algorithm
+
+Simple XOR-based checksum for data integrity:
+
+```ailang
+Function.Save_ComputeChecksum {
+    Input: data: Address
+    Input: length: Integer
+    Output: Integer
+    Body: {
+        checksum = 0
+        i = 0
+        WhileLoop LessThan(i, length) {
+            b = GetByte(data, i)
+            // Rotate and XOR
+            checksum = BitwiseXor(checksum, LeftShift(b, Modulo(i, 24)))
+            i = Add(i, 1)
+        }
+        ReturnValue(checksum)
+    }
+}
+```
+
+On load, checksum is recomputed and compared. Mismatch indicates corruption or tampering.
+
+---
+
+## Network Considerations
+
+The save system is designed for future multiplayer:
+
+| Feature | Network Benefit |
+|---------|-----------------|
+| Party arrays | Multiple players per save |
+| Checksum | Detect client-side tampering |
+| Slot isolation | Per-player save directories |
+| Flag system | Sync quest state across party |
+
+### Server-Side Saves
+
+For network play, saves would be stored server-side:
+
+```
+saves/
+├── player_001/
+│   ├── slot_0.dndsav
+│   ├── slot_1.dndsav
+│   └── slot_2.dndsav
+├── player_002/
+│   └── slot_0.dndsav
+└── shared/
+    └── world_flags.dat    # Global quest state
+```
+
+### Auto-Save
+
+Server can auto-save periodically:
+
+```ini
+# In server.dnddat
+[SAVES]
+AUTO_SAVE=1
+SAVE_INTERVAL=300         # Every 5 minutes
+```
+
+---
+
+## Troubleshooting
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Save won't load | Checksum mismatch | Delete corrupted file |
+| Wrong position after load | INN checkpoint overwriting | Check Save_SetInnCheckpoint calls |
+| Flags not persisting | Not saving after flag change | Save after important events |
+| Inventory lost | Equipment vs inventory confusion | Check slot indices |
+| Party member missing | Array index error | Verify party_count |
+
+### Debug Tips
+
+1. Save files are human-readable — open in text editor to inspect
+2. Checksum value changes with any modification
+3. Set `VERSION=999` to force save system to reject old saves
+4. Use Quick Save during development for fast iteration
