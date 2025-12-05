@@ -43,9 +43,10 @@ A fully data-driven, open-source RPG engine inspired by Dragon Quest and tableto
 
 ## Prerequisites
 
+-[Ailang Project](https://github.com/AiLang-Author/AiLang)
 - [AILang compiler](https://github.com/AiLang-Author/AiLang/tree/master/ailang)
 - Python 3.x (to run compiler)
-- Linux (x86-64)
+- Linux (x86-64) ailang make use of syscalls, has it's own memory model and leverage pure kernel resources no external depdencys !
 
 ## Build & Run
 
