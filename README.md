@@ -43,7 +43,7 @@ A fully data-driven, open-source RPG engine inspired by Dragon Quest and tableto
 
 ## Prerequisites
 
--[Ailang Project](https://github.com/AiLang-Author/AiLang)
+- [Ailang Project](https://github.com/AiLang-Author/AiLang)
 - [AILang compiler](https://github.com/AiLang-Author/AiLang/tree/master/ailang)
 - Python 3.x (to run compiler)
 - Linux (x86-64) ailang make use of syscalls, has it's own memory model and leverage pure kernel resources no external depdencys !
@@ -158,20 +158,6 @@ Fantasy-Forge-Engine-/
 └── dnd/
     └── ailang/
         ├── dnd.ailang              # Main entry point
-        ├── Library.DND.ailang      # Core game engine
-        ├── Library.TUI.ailang      # Terminal rendering
-        ├── Library.DICE.ailang     # RNG and dice rolls
-        ├── Library.Character.ailang
-        ├── Library.Item.ailang
-        ├── Library.Shop.ailang
-        ├── Library.Inn.ailang
-        ├── Library.Save.ailang
-        ├── Library.SaveScreen.ailang
-        ├── Library.World.ailang
-        ├── Library.GameConfig.ailang
-        ├── Library.Encounter.ailang
-        ├── Library.BattleScreen.ailang
-        ├── Library.EquipScreen.ailang
         ├── data/
         │   ├── game.dndconf        # Demo world config
         │   ├── items.dnddat
@@ -185,9 +171,25 @@ Fantasy-Forge-Engine-/
         │   └── dungeon1.dndmap
         ├── saves/
         └── docs/
-            ├── DATA_FORMATS.md
-            ├── SAVE_SYSTEM.md
-            └── NETWORK_ARCHITECTURE.md
+        |   ├── DATA_FORMATS.md
+        |   ├── SAVE_SYSTEM.md
+        |   └── NETWORK_ARCHITECTURE.md
+        |
+        |_Librarys
+            ├── Library.DND.ailang      # Core game engine
+            ├── Library.TUI.ailang      # Terminal rendering
+            ├── Library.DICE.ailang     # RNG and dice rolls
+            ├── Library.Character.ailang
+            ├── Library.Item.ailang
+            ├── Library.Shop.ailang
+            ├── Library.Inn.ailang
+            ├── Library.Save.ailang
+            ├── Library.SaveScreen.ailang
+            ├── Library.World.ailang
+            ├── Library.GameConfig.ailang
+            ├── Library.Encounter.ailang
+            ├── Library.BattleScreen.ailang
+            ├── Library.EquipScreen.ailang
 ```
 
 ## Roadmap
