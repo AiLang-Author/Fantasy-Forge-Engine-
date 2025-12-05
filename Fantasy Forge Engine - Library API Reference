@@ -1,0 +1,367 @@
+# Fantasy Forge Engine - Library API Reference
+
+Quick reference for all library functions. See source files for implementation details.
+
+---
+
+## Library.Character
+
+Character creation, stats, leveling, and skills.
+
+### Constants
+
+```ailang
+Char_Limits.MAX_LEVEL = 30
+Char_Limits.MAX_SKILLS = 20
+Char_Limits.MAX_EQUIPPED = 6
+Char_Offsets.SIZE = 256  // bytes per character
+
+Char_Classes.WARRIOR = 1
+Char_Classes.MAGE = 2
+Char_Classes.ROGUE = 3
+Char_Classes.CLERIC = 4
+Char_Classes.RANGER = 5
+
+Char_Slots.WEAPON = 0
+Char_Slots.ARMOR = 1
+Char_Slots.SHIELD = 2
+Char_Slots.HELMET = 3
+Char_Slots.RING = 4
+Char_Slots.AMULET = 5
+```
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `Char_Init()` | — | Integer | Initialize character system |
+| `Char_Cleanup()` | — | Integer | Free character memory |
+| `Char_Create(name, class_id)` | Address, Integer | Address | Create new character |
+| `Char_GetLevel(char)` | Address | Integer | Get character level |
+| `Char_GetClass(char)` | Address | Integer | Get class ID |
+| `Char_GetHP(char)` | Address | Integer | Get current HP |
+| `Char_GetMaxHP(char)` | Address | Integer | Get max HP |
+| `Char_GetMP(char)` | Address | Integer | Get current MP |
+| `Char_GetMaxMP(char)` | Address | Integer | Get max MP |
+| `Char_GetStat16(char, offset)` | Address, Integer | Integer | Get 16-bit stat |
+| `Char_SetStat16(char, offset, val)` | Address, Integer, Integer | — | Set 16-bit stat |
+| `Char_AddXP(char, amount)` | Address, Integer | Integer | Add XP, returns 1 if leveled |
+| `Char_CheckLevelUp(char)` | Address | Integer | Force level-up check |
+| `Char_LearnSkill(char, skill_id)` | Address, Integer | Integer | Learn skill (1=learned, 0=known, -1=full) |
+| `Char_RecalculateStats(char)` | Address | Integer | Recalc derived stats |
+| `Char_GetClassName(class_id)` | Integer | Address | Get class name string |
+| `Char_RegisterClass(...)` | ... | Integer | Register custom class |
+| `Char_RegisterSkill(...)` | ... | Integer | Register custom skill |
+
+### Stat Offsets (for `Char_GetStat16`/`Char_SetStat16`)
+
+```ailang
+Char_Offsets.HP = 32      Char_Offsets.MAX_HP = 34
+Char_Offsets.MP = 36      Char_Offsets.MAX_MP = 38
+Char_Offsets.STR = 40     Char_Offsets.AGI = 42
+Char_Offsets.VIT = 44     Char_Offsets.INT = 46
+Char_Offsets.LUK = 48     Char_Offsets.ATK = 50
+Char_Offsets.DEF = 52     Char_Offsets.SPD = 54
+Char_Offsets.MATK = 56    Char_Offsets.MDEF = 58
+```
+
+---
+
+## Library.Item
+
+Items, inventory, and equipment.
+
+### Constants
+
+```ailang
+Item_Limits.MAX_ITEMS = 100
+Item_Limits.MAX_INVENTORY = 20
+Item_Offsets.SIZE = 32  // bytes per item
+
+Item_Types.WEAPON = 1    Item_Types.ARMOR = 2
+Item_Types.SHIELD = 3    Item_Types.HELMET = 4
+Item_Types.RING = 5      Item_Types.AMULET = 6
+Item_Types.POTION = 7    Item_Types.SCROLL = 8
+Item_Types.KEY = 9       Item_Types.FOOD = 11
+
+Item_Slots.WEAPON = 0    Item_Slots.ARMOR = 1
+Item_Slots.SHIELD = 2    Item_Slots.HELMET = 3
+Item_Slots.RING = 4      Item_Slots.AMULET = 5
+Item_Slots.NONE = 255
+
+Item_Rarity.COMMON = 1   Item_Rarity.UNCOMMON = 2
+Item_Rarity.RARE = 3     Item_Rarity.EPIC = 4
+Item_Rarity.LEGENDARY = 5
+```
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `Item_Init()` | — | Integer | Initialize item system |
+| `Item_Cleanup()` | — | Integer | Free item memory |
+| `Item_Register(id, name, type, slot, value, atk, def, mag)` | ... | Integer | Register basic item |
+| `Item_RegisterFull(...)` | ... | Integer | Register with all fields |
+| `Item_GetName(id)` | Integer | Address | Get item name |
+| `Item_GetType(id)` | Integer | Integer | Get item type |
+| `Item_GetSlot(id)` | Integer | Integer | Get equip slot |
+| `Item_GetValue(id)` | Integer | Integer | Get gold value |
+| `Item_GetRarity(id)` | Integer | Integer | Get rarity level |
+| `Item_GetRarityColor(rarity)` | Integer | Integer | Get ANSI color for rarity |
+| `Item_InvAdd(id, qty)` | Integer, Integer | Integer | Add to inventory |
+| `Item_InvRemove(idx, qty)` | Integer, Integer | Integer | Remove from inventory |
+| `Item_InvCount()` | — | Integer | Get inventory item count |
+| `Item_InvGetItemId(idx)` | Integer | Integer | Get item ID at index |
+| `Item_InvGetQuantity(idx)` | Integer | Integer | Get quantity at index |
+| `Item_InvHasItem(id)` | Integer | Integer | Check if item in inventory |
+| `Item_Equip(char, id)` | Address, Integer | Integer | Equip item |
+| `Item_Unequip(char, slot)` | Address, Integer | Integer | Unequip slot |
+| `Item_GetEquipped(slot)` | Integer | Integer | Get equipped item ID |
+
+---
+
+## Library.Shop
+
+Shop system with buy/sell mechanics.
+
+### Constants
+
+```ailang
+Shop_Limits.MAX_SHOPS = 20
+Shop_Limits.MAX_STOCK = 30
+Shop_Offsets.SIZE = 64
+
+Shop_Types.GENERAL = 1   Shop_Types.WEAPON = 2
+Shop_Types.ARMOR = 3     Shop_Types.MAGIC = 4
+```
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `Shop_Init()` | — | Integer | Initialize shop system |
+| `Shop_Cleanup()` | — | Integer | Free shop memory |
+| `Shop_Register(id, name, buy_rate, sell_rate, map, x, y, type)` | ... | Integer | Register shop |
+| `Shop_AddStock(shop_id, item_id, qty, restock)` | ... | Integer | Add item to stock |
+| `Shop_GetAtPosition(map, x, y)` | Integer×3 | Integer | Find shop at tile |
+| `Shop_GetName(id)` | Integer | Address | Get shop name |
+| `Shop_GetBuyRate(id)` | Integer | Integer | Get buy rate % |
+| `Shop_GetSellRate(id)` | Integer | Integer | Get sell rate % |
+| `Shop_GetBuyPrice(shop, item)` | Integer×2 | Integer | Calculate buy price |
+| `Shop_GetSellPrice(shop, item)` | Integer×2 | Integer | Calculate sell price |
+| `Shop_GetStockCount(id)` | Integer | Integer | Get stock count |
+| `Shop_GetStockItem(shop, idx)` | Integer×2 | Integer | Get stocked item ID |
+| `Shop_GetStockQty(shop, idx)` | Integer×2 | Integer | Get stock quantity |
+| `Shop_Buy(shop, idx, gold_ptr)` | Integer×2, Address | Integer | Buy item |
+| `Shop_Sell(shop, inv_idx, gold_ptr)` | Integer×2, Address | Integer | Sell item |
+| `Shop_Open(shop, gold_ptr)` | Integer, Address | Integer | Open shop UI |
+
+**Return codes:** `-1` out of stock, `-2` can't afford, `-3` inventory full
+
+---
+
+## Library.Inn
+
+Rest and save checkpoint system.
+
+### Constants
+
+```ailang
+Inn_Limits.MAX_INNS = 20
+Inn_Offsets.SIZE = 48
+```
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `Inn_Init()` | — | Integer | Initialize inn system |
+| `Inn_Cleanup()` | — | Integer | Free inn memory |
+| `Inn_Register(id, name, price, map, x, y, save)` | ... | Integer | Register inn |
+| `Inn_GetAtPosition(map, x, y)` | Integer×3 | Integer | Find inn at tile |
+| `Inn_GetName(id)` | Integer | Address | Get inn name |
+| `Inn_GetPrice(id)` | Integer | Integer | Get rest price |
+| `Inn_CanSave(id)` | Integer | Integer | Check if can save |
+| `Inn_Rest(inn, char, gold_ptr)` | Integer, Address×2 | Integer | Rest single char |
+| `Inn_RestParty(inn, char, party, count, gold_ptr)` | ... | Integer | Rest party |
+| `Inn_GetDaysPassed()` | — | Integer | Get game days |
+| `Inn_ShowMenu_v2(inn, char, party, count, gold_ptr, x, y, map)` | ... | Integer | Full inn UI |
+
+---
+
+## Library.Save
+
+Save/load game state with quest flags.
+
+### Constants
+
+```ailang
+Save_Limits.MAX_SLOTS = 3
+Save_Limits.MAX_PARTY = 4
+Save_Limits.MAX_FLAGS = 64
+Save_Limits.VERSION = 1
+```
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `Save_Init()` | — | Integer | Initialize save system |
+| `Save_Cleanup()` | — | Integer | Free save memory |
+| `Save_Game(slot, party, count, x, y, map, gold, loc)` | ... | Integer | Save party game |
+| `Save_GameSingle(slot, char, x, y, map, gold, loc)` | ... | Integer | Save single player |
+| `Save_Load(slot, party, &count, &x, &y, &map, &gold)` | ... | Integer | Load party game |
+| `Save_LoadSingle(slot, &char, &x, &y, &map, &gold)` | ... | Integer | Load single player |
+| `Save_QuickSave(char, x, y, map, gold)` | ... | Integer | Quick save (slot 0) |
+| `Save_QuickLoad(&char, &x, &y, &map, &gold)` | ... | Integer | Quick load |
+| `Save_SetFlag(name, value)` | Address, Integer | Integer | Set quest flag |
+| `Save_GetFlag(name)` | Address | Integer | Get quest flag |
+| `Save_SetInnCheckpoint(map, x, y)` | Integer×3 | Integer | Set respawn point |
+| `Save_GetInnCheckpoint(&map, &x, &y)` | Address×3 | Integer | Get respawn point |
+| `Save_SlotExists(slot)` | Integer | Integer | Check slot exists |
+| `Save_DeleteSlot(slot)` | Integer | Integer | Delete save |
+| `Save_AddPlaytime(seconds)` | Integer | Integer | Add playtime |
+
+---
+
+## Library.Encounter
+
+Random battle zones and encounter checks.
+
+### Constants
+
+```ailang
+Enc_Limits.MAX_ZONES = 30
+Enc_Limits.MAX_GROUPS = 10
+Enc_Limits.MAX_BATTLE_MONSTERS = 6
+
+Zone_Flags.DISABLED = 1
+Zone_Flags.BOSS_ZONE = 2
+Zone_Flags.NO_ESCAPE = 4
+```
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `Enc_Init()` | — | Integer | Initialize encounter system |
+| `Enc_Cleanup()` | — | Integer | Free encounter memory |
+| `Enc_RegisterZone(id, name, map, minX, minY, maxX, maxY, rate)` | ... | Integer | Register zone |
+| `Enc_AddGroup(zone, monster, min, max, weight)` | ... | Integer | Add monster group |
+| `Enc_GetZoneAt(map, x, y)` | Integer×3 | Integer | Find zone at position |
+| `Enc_GetZoneRate(zone)` | Integer | Integer | Get encounter rate % |
+| `Enc_GetZoneName(zone)` | Integer | Address | Get zone name |
+| `Enc_CheckEncounter(map, x, y)` | Integer×3 | Integer | Roll for battle |
+| `Enc_StartBattle(zone)` | Integer | Integer | Start battle in zone |
+| `Enc_IsInBattle()` | — | Integer | Check if in battle |
+| `Enc_GetBattleMonsterCount()` | — | Integer | Get enemy count |
+| `Enc_GetBattleMonsterId(idx)` | Integer | Integer | Get monster ID |
+| `Enc_GetBattleMonsterHP(idx)` | Integer | Integer | Get monster HP |
+| `Enc_SetBattleMonsterHP(idx, hp)` | Integer×2 | Integer | Set monster HP |
+| `Enc_CanEscape()` | — | Integer | Check if can flee |
+| `Enc_TryEscape(agi)` | Integer | Integer | Attempt to flee |
+| `Enc_EndBattle()` | — | Integer | End current battle |
+
+---
+
+## Library.DICE
+
+Random number generation and dice rolls.
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `Dice_Init()` | — | Integer | Seed RNG from time |
+| `Dice_Roll(num, sides)` | Integer×2 | Integer | Roll NdS |
+| `Dice_RollMod(num, sides, mod)` | Integer×3 | Integer | Roll NdS+M |
+| `Dice_D20()` | — | Integer | Quick d20 roll |
+| `Dice_D6()` | — | Integer | Quick d6 roll |
+| `Dice_Advantage(num, sides)` | Integer×2 | Integer | Roll twice, take best |
+| `Dice_Disadvantage(num, sides)` | Integer×2 | Integer | Roll twice, take worst |
+| `Dice_Percent()` | — | Integer | Roll 1-100 |
+| `Dice_Range(max)` | Integer | Integer | Roll 1 to max |
+| `Dice_RangeMinMax(min, max)` | Integer×2 | Integer | Roll min to max |
+
+---
+
+## Library.TUI
+
+Terminal user interface (rendering and input).
+
+### Constants
+
+```ailang
+TUI_Keys.KEY_UP = 65      TUI_Keys.KEY_DOWN = 66
+TUI_Keys.KEY_RIGHT = 67   TUI_Keys.KEY_LEFT = 68
+TUI_Keys.KEY_ENTER = 10   TUI_Keys.KEY_ESC = 27
+TUI_Keys.KEY_SPACE = 32   TUI_Keys.KEY_TAB = 9
+TUI_Keys.KEY_NONE = 0
+```
+
+### Functions
+
+| Function | Input | Output | Description |
+|----------|-------|--------|-------------|
+| `TUI_Init()` | — | Integer | Enter raw mode |
+| `TUI_Cleanup()` | — | Integer | Restore terminal |
+| `TUI_Clear()` | — | Integer | Clear screen |
+| `TUI_MoveTo(row, col)` | Integer×2 | Integer | Move cursor |
+| `TUI_Print(str)` | Address | Integer | Print string |
+| `TUI_PrintNum(n)` | Integer | Integer | Print number |
+| `TUI_PrintAt(row, col, str)` | Integer×2, Address | Integer | Print at position |
+| `TUI_PrintChar(c)` | Integer | Integer | Print character |
+| `TUI_SetFG(color)` | Integer | Integer | Set foreground (0-7) |
+| `TUI_SetBG(color)` | Integer | Integer | Set background (0-7) |
+| `TUI_Bold()` | — | Integer | Enable bold |
+| `TUI_Dim()` | — | Integer | Enable dim |
+| `TUI_Reverse()` | — | Integer | Reverse colors |
+| `TUI_ResetColor()` | — | Integer | Reset attributes |
+| `TUI_Refresh()` | — | Integer | Flush output |
+| `TUI_GetKey()` | — | Integer | Non-blocking input |
+| `TUI_WaitKey()` | — | Integer | Blocking input |
+| `TUI_GetWidth()` | — | Integer | Terminal width |
+| `TUI_GetHeight()` | — | Integer | Terminal height |
+| `TUI_CenterText(row, str, width)` | Integer, Address, Integer | Integer | Center text |
+| `TUI_DrawBox(r, c, h, w)` | Integer×4 | Integer | Draw box |
+
+### Colors
+`0`=Black, `1`=Red, `2`=Green, `3`=Yellow, `4`=Blue, `5`=Magenta, `6`=Cyan, `7`=White
+
+---
+
+## Library.DND
+
+Main game engine orchestration.
+
+### Key Functions
+
+| Function | Description |
+|----------|-------------|
+| `DND_Init()` | Initialize all systems |
+| `DND_Cleanup()` | Shutdown all systems |
+| `DND_Run()` | Main game loop |
+| `DND_LoadMap(map_id)` | Load and switch map |
+| `DND_MovePlayer(dx, dy)` | Move player with collision |
+| `DND_HandleInput(key)` | Process input |
+| `DND_DrawUI()` | Render game screen |
+| `DND_AddMessage(text)` | Add message to log |
+| `DND_HandleDeath()` | Show death screen |
+| `DND_RespawnAtInn()` | Respawn at checkpoint |
+| `DND_SetQuestFlag(name, val)` | Set quest flag |
+| `DND_GetQuestFlag(name)` | Get quest flag |
+
+### State Pools
+
+```ailang
+DND_Player.x, .y        // Position
+DND_Player.char_data    // Character pointer
+DND_Player.gold         // Gold amount
+
+DND_Map.data           // Map tile data
+DND_Map.width, .height // Dimensions
+DND_Map.name           // Map name
+DND_Map.level          // Map ID
+
+DND_GameState.running  // Game loop flag
+```
