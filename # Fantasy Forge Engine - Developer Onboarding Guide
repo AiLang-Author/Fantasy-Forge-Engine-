@@ -1,0 +1,414 @@
+# Fantasy Forge Engine - Developer Onboarding Guide
+
+Welcome to Fantasy Forge! This guide will get you up and running with the codebase.
+
+## Quick Start (5 Minutes)
+
+```bash
+# 1. Clone both repos
+git clone https://github.com/AiLang-Author/Fantasy-Forge-Engine-.git
+git clone https://github.com/AiLang-Author/AiLang.git
+
+# 2. Compile
+cd Fantasy-Forge-Engine-/dnd/ailang
+python3 ../../AiLang/ailang/main.py dnd.ailang
+
+# 3. Run
+./dnd_exec data/game.dndconf
+```
+
+Controls: Arrow keys or `hjkl` to move, `i` inventory, `e` equipment, `s` save (at inns), `q` quit.
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        dnd.ailang                           │
+│                     (Entry Point)                           │
+└─────────────────────────────────────────────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+┌───────────────┐    ┌───────────────┐    ┌───────────────┐
+│ Library.DND   │    │Library.GameCfg│    │ Library.TUI   │
+│ (Game Logic)  │    │ (.dndconf)    │    │ (Rendering)   │
+└───────────────┘    └───────────────┘    └───────────────┘
+        │
+        ├──► Library.Character   (Classes, Stats, Skills, Leveling)
+        ├──► Library.Item        (Items, Inventory, Equipment)
+        ├──► Library.Shop        (Buy/Sell, Stock, Pricing)
+        ├──► Library.Inn         (Rest, Heal, Checkpoints)
+        ├──► Library.Save        (Save/Load, Quest Flags)
+        ├──► Library.Encounter   (Random Battles, Zones)
+        ├──► Library.BattleScreen(Combat UI)
+        ├──► Library.World       (Maps, Portals)
+        └──► Library.DICE        (RNG, Dice Rolls)
+```
+
+---
+
+## Key Concepts
+
+### 1. Data-Driven Everything
+
+The engine is designed so content creators never touch code. All game content lives in text files:
+
+| File Type | Purpose | Example |
+|-----------|---------|---------|
+| `.dndconf` | World configuration | Starting position, map list, shops, inns |
+| `.dndmap` | Map layouts | ASCII grid with tile characters |
+| `.dnddat` | Data tables | Items, monsters, classes, encounters |
+| `.dndsav` | Save files | Player state, inventory, quest flags |
+| `.dndscript` | Dialogue (planned) | NPC conversations, quest triggers |
+
+### 2. Memory Layout
+
+AILang uses explicit memory management. Each entity type has a fixed byte structure:
+
+```
+Character: 256 bytes
+├── Name (24 bytes)
+├── Class, Level (2 bytes)
+├── XP (6 bytes)
+├── HP/MP (8 bytes)
+├── Stats: STR/AGI/VIT/INT/LUK (10 bytes)
+├── Derived: ATK/DEF/SPD/MATK/MDEF (10 bytes)
+├── Equipment slots (48 bytes)
+├── Known skills (40 bytes)
+└── Reserved (108 bytes)
+
+Item: 32 bytes
+├── Name (20 bytes)
+├── Type, Slot (2 bytes)
+├── Value (2 bytes)
+├── Bonuses: ATK/DEF/MAG/HP/MP (5 bytes)
+├── Req Level, Rarity (2 bytes)
+└── Flags (1 byte)
+
+Monster: 48 bytes
+├── Alive flag, Type (2 bytes)
+├── Position X/Y (4 bytes)
+├── HP/MaxHP/AC (6 bytes)
+├── Damage dice/sides/mod (3 bytes)
+├── XP value (2 bytes)
+├── Symbol (1 byte)
+└── Name (30 bytes)
+```
+
+### 3. Initialization Order
+
+The engine must initialize systems in dependency order:
+
+```ailang
+// In DND_Init:
+TUI_Init()           // Terminal first
+Dice_Init()          // RNG seeding
+Char_Init()          // Character tables
+Item_Init()          // Item registry
+Inv_Init()           // Inventory system
+Shop_Init()          // Shop system
+Inn_Init()           // Inn system
+Save_Init()          // Save system
+Enc_Init()           // Encounter zones
+Battle_Init()        // Battle system
+World_Init()         // Portal system
+```
+
+---
+
+## Library Quick Reference
+
+### Library.Character
+
+```ailang
+// Create character
+char_data = Char_Create("Hero", Char_Classes.WARRIOR)
+
+// Access stats
+level = Char_GetLevel(char_data)
+hp = Char_GetHP(char_data)
+max_hp = Char_GetMaxHP(char_data)
+
+// Modify stats
+Char_SetStat16(char_data, Char_Offsets.HP, new_hp)
+Char_Heal(char_data, amount)
+Char_TakeDamage(char_data, amount)
+
+// Experience & leveling
+Char_AddXP(char_data, xp_gained)  // Auto level-up check
+did_level = Char_CheckLevelUp(char_data)
+
+// Skills
+Char_LearnSkill(char_data, skill_id)
+skill_count = GetByte(char_data, Char_Offsets.SKILL_COUNT)
+
+// Derived stats (call after equipment changes)
+Char_RecalculateStats(char_data)
+```
+
+**Classes:** `WARRIOR(1)`, `MAGE(2)`, `ROGUE(3)`, `CLERIC(4)`, `RANGER(5)`
+
+**Stat Offsets:** `STR(40)`, `AGI(42)`, `VIT(44)`, `INT(46)`, `LUK(48)`
+
+---
+
+### Library.Item
+
+```ailang
+// Registry
+Item_Register(id, "Iron Sword", WEAPON, WEAPON_SLOT, 25, 6, 0, 0, 0, 0, 1, COMMON)
+
+// Lookup
+name = Item_GetName(item_id)
+value = Item_GetValue(item_id)
+slot = Item_GetSlot(item_id)
+
+// Inventory
+Item_InvAdd(item_id, quantity)
+Item_InvRemove(index, quantity)
+count = Item_InvCount()
+item_id = Item_InvGetItemId(index)
+qty = Item_InvGetQuantity(index)
+
+// Equipment
+Item_Equip(char_data, item_id)
+Item_Unequip(char_data, slot)
+equipped_id = Item_GetEquipped(slot)
+```
+
+**Item Types:** `WEAPON(1)`, `ARMOR(2)`, `SHIELD(3)`, `HELMET(4)`, `RING(5)`, `AMULET(6)`, `POTION(7)`, `SCROLL(8)`, `KEY(9)`
+
+**Rarity:** `COMMON(1)`, `UNCOMMON(2)`, `RARE(3)`, `EPIC(4)`, `LEGENDARY(5)`
+
+---
+
+### Library.Shop
+
+```ailang
+// Register shop
+Shop_Register(id, "Weapon Shop", buy_rate, sell_rate, map_id, x, y, WEAPON_TYPE)
+Shop_AddStock(shop_id, item_id, quantity, restock_rate)
+
+// Lookup
+shop_id = Shop_GetAtPosition(map_id, x, y)
+price = Shop_GetBuyPrice(shop_id, item_id)
+sell = Shop_GetSellPrice(shop_id, item_id)
+
+// Transactions (returns price paid, or negative on error)
+result = Shop_Buy(shop_id, stock_idx, AddressOf(gold))
+result = Shop_Sell(shop_id, inv_idx, AddressOf(gold))
+
+// UI
+Shop_Open(shop_id, AddressOf(gold))  // Full shop interface
+```
+
+**Return codes:** `-1` out of stock, `-2` can't afford, `-3` inventory full
+
+---
+
+### Library.Inn
+
+```ailang
+// Register inn
+Inn_Register(id, "Cozy Inn", price, map_id, x, y, save_enabled)
+
+// Lookup
+inn_id = Inn_GetAtPosition(map_id, x, y)
+price = Inn_GetPrice(inn_id)
+can_save = Inn_CanSave(inn_id)
+
+// Rest (heals party, costs gold)
+result = Inn_Rest(inn_id, char_data, AddressOf(gold))
+result = Inn_RestParty(inn_id, char, party, party_count, AddressOf(gold))
+
+// UI
+Inn_ShowMenu_v2(inn_id, char, party, count, AddressOf(gold), x, y, map)
+```
+
+---
+
+### Library.Save
+
+```ailang
+// Initialize
+Save_Init()
+
+// Save/Load (single character)
+Save_GameSingle(slot, char, x, y, map_id, gold, location_name)
+Save_LoadSingle(slot, AddressOf(char), AddressOf(x), AddressOf(y), AddressOf(map), AddressOf(gold))
+
+// Save/Load (party)
+Save_Game(slot, party_array, party_count, x, y, map_id, gold, location)
+Save_Load(slot, party_array, AddressOf(count), AddressOf(x), AddressOf(y), AddressOf(map), AddressOf(gold))
+
+// Quest flags (persisted in save)
+Save_SetFlag("quest_dragon", 1)
+value = Save_GetFlag("quest_dragon")
+
+// Inn checkpoints
+Save_SetInnCheckpoint(map_id, x, y)
+Save_GetInnCheckpoint(AddressOf(map), AddressOf(x), AddressOf(y))
+
+// Utilities
+exists = Save_SlotExists(slot)  // 0 or 1
+Save_DeleteSlot(slot)
+Save_AddPlaytime(seconds)
+```
+
+---
+
+### Library.Encounter
+
+```ailang
+// Define encounter zone
+Enc_RegisterZone(id, "Forest", map_id, min_x, min_y, max_x, max_y, rate_percent)
+Enc_AddGroup(zone_id, monster_id, min_count, max_count, weight)
+
+// Check for random battle (call every step)
+battle_started = Enc_CheckEncounter(map_id, x, y)  // Returns 1 if battle
+
+// Battle state
+in_battle = Enc_IsInBattle()
+count = Enc_GetBattleMonsterCount()
+monster_id = Enc_GetBattleMonsterId(index)
+hp = Enc_GetBattleMonsterHP(index)
+Enc_SetBattleMonsterHP(index, new_hp)
+
+// Escape
+escaped = Enc_TryEscape(player_agility)  // 1 = success
+Enc_EndBattle()
+```
+
+---
+
+### Library.DICE
+
+```ailang
+// Initialize (seeds RNG from system time)
+Dice_Init()
+
+// Roll dice
+result = Dice_Roll(num_dice, sides)        // e.g., 2d6
+result = Dice_RollMod(num, sides, modifier) // e.g., 1d20+5
+result = Dice_D20()                         // Quick d20
+
+// Advantage/disadvantage (roll twice, take best/worst)
+result = Dice_Advantage(num, sides)
+result = Dice_Disadvantage(num, sides)
+
+// Utility
+percent = Dice_Percent()           // 1-100
+value = Dice_Range(max)            // 1 to max
+value = Dice_RangeMinMax(min, max) // min to max
+```
+
+---
+
+## Common Tasks
+
+### Adding a New Item
+
+1. Add to `data/items.dnddat`:
+```csv
+ITEM,100,Flame Sword,WEAPON,WEAPON,150,12,0,5,0,0,5,RARE
+```
+
+2. Or register in code:
+```ailang
+Item_RegisterFull(100, "Flame Sword", Item_Types.WEAPON, Item_Slots.WEAPON, 
+                  150, 12, 0, 5, 0, 0, 5, Item_Rarity.RARE)
+```
+
+### Adding a New Monster
+
+Add to `data/monsters.dnddat`:
+```csv
+MONSTER,50,Fire Elemental,F,45,14,2,8,3,150,6
+```
+Fields: id, name, symbol, hp, ac, damage_dice, damage_sides, damage_mod, xp, level
+
+### Adding a New Map
+
+1. Create `maps/mymap.dndmap`:
+```
+NAME:My Dungeon
+SIZE:30,20
+START:5,5
+TYPE:DUNGEON
+PARENT:0,10,10
+##############################
+#............................#
+#..M.......M.......M........#
+#............................#
+##############################
+```
+
+2. Register in `data/game.dndconf`:
+```ini
+[MAPS]
+10,maps/mymap.dndmap,DUNGEON,My Dungeon
+```
+
+### Adding an Encounter Zone
+
+Add to `data/encounters.dnddat`:
+```csv
+ZONE,10,Fire Cave,10,0,0,29,19,18
+GROUP,10,50,1,2,60
+GROUP,10,50,2,3,30
+GROUP,10,51,1,1,10
+```
+
+---
+
+## Debugging Tips
+
+1. **Enable debug output:** Compile with `-D` flag for debug symbols
+2. **Check memory:** Use `DebugMemory.Dump(address, size, "label")`
+3. **Trace execution:** Add `TUI_Print()` calls (renders immediately)
+4. **Save file inspection:** `.dndsav` files are human-readable INI format
+
+### Common Issues
+
+| Problem | Likely Cause | Fix |
+|---------|--------------|-----|
+| Crash on startup | Init order wrong | Check dependency chain |
+| Stats not updating | Forgot RecalculateStats | Call after equipment change |
+| Shop shows wrong price | buy_rate misconfigured | Check shops.dnddat |
+| Encounter never triggers | Zone bounds wrong | Verify min/max X/Y |
+| Save won't load | Checksum mismatch | Delete corrupted save |
+
+---
+
+## Code Style
+
+```ailang
+// Use descriptive FixedPool names
+FixedPool.Shop_State { ... }
+
+// Functions follow Module_Action pattern
+Function.Shop_GetBuyPrice { ... }
+
+// Comment complex offset calculations
+// Monster HP at offset 6-7 (2 bytes, little-endian)
+hp = Add(GetByte(base, 6), Multiply(GetByte(base, 7), 256))
+
+// Always check return values
+result = Shop_Buy(shop_id, idx, gold_ptr)
+IfCondition LessThan(result, 0) ThenBlock: {
+    // Handle error
+}
+```
+
+---
+
+## Next Steps
+
+1. Read `DATA_FORMATS.md` for complete file format specs
+2. Read `LIBRARY_REFERENCE.md` for full API documentation
+3. Try modifying `data/game.dndconf` to create your own world
+4. Check `docs/NETWORK_ARCHITECTURE.md` for multiplayer plans
+
+Questions? Open an issue on GitHub!
