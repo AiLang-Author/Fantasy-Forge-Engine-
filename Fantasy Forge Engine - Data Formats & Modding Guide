@@ -1,0 +1,472 @@
+# Fantasy Forge Engine - Data Formats & Modding Guide
+
+All game content is defined in text files. Edit these to create your own adventures without touching code.
+
+## File Types Overview
+
+| Extension | Purpose | Location |
+|-----------|---------|----------|
+| `.dndconf` | World configuration | `data/` |
+| `.dndmap` | Map/level layouts | `maps/` |
+| `.dnddat` | Data tables (CSV-like) | `data/` |
+| `.dndsav` | Save games | `saves/` |
+| `.dndscript` | Dialogue & events (planned) | `data/scripts/` |
+
+---
+
+## World Configuration (.dndconf)
+
+The main configuration file that defines your world.
+
+```ini
+# ============================================
+# My Adventure - World Configuration
+# ============================================
+
+[WORLD]
+NAME=The Goblin Caves
+AUTHOR=Your Name
+VERSION=1.0
+
+[START]
+MAP=0
+X=10
+Y=10
+GOLD=50
+
+[MAPS]
+# ID,filepath,type,name
+0,maps/overworld.dndmap,OVERWORLD,The Realm
+1,maps/town.dndmap,TOWN,Starter Town
+2,maps/dungeon1.dndmap,DUNGEON,Goblin Cave B1
+3,maps/dungeon2.dndmap,DUNGEON,Goblin Cave B2
+
+[PORTALS]
+# Simple bidirectional pairs
+overworld_town,town_exit
+overworld_cave,dungeon1_up
+dungeon1_down,dungeon2_up
+
+[INNS]
+# map_id,x,y,name,price,save_enabled
+1,5,4,Weary Traveler Inn,10,1
+
+[SHOPS]
+# map_id,x,y,name,type,buy_rate,sell_rate
+1,12,4,Blade & Steel,WEAPON,100,50
+1,20,4,Armor Emporium,ARMOR,100,50
+
+[ITEMS]
+# Starting inventory: item_id,quantity
+60,2
+80,5
+```
+
+### Map Types
+`OVERWORLD`, `TOWN`, `DUNGEON`, `BUILDING`, `CAVE`
+
+### Shop Types
+`GENERAL`, `WEAPON`, `ARMOR`, `MAGIC`
+
+---
+
+## Map Format (.dndmap)
+
+ASCII-based map files with metadata header.
+
+```
+NAME:Starter Town
+SIZE:40,25
+START:20,12
+TYPE:TOWN
+PARENT:0,15,15
+########################################
+#......................................#
+#..+---+........+---+..................#
+#..|   |........|   |.....S............#
+#..|   +........+   |..................#
+#..+---+........+---+..................#
+#......................................#
+#.......I..............................#
+#......................................#
+#..+---+...........+---+...............#
+#..|   |...........|   |...............#
+#..|   +...........+   |...............#
+#..+---+...........+---+...............#
+#......................................#
+#....................>.................#
+#......................................#
+########################################
+```
+
+### Header Fields
+
+| Field | Format | Description |
+|-------|--------|-------------|
+| `NAME:` | string | Display name for UI |
+| `SIZE:` | width,height | Map dimensions (max 80x40) |
+| `START:` | x,y | Default player spawn |
+| `TYPE:` | keyword | Map category |
+| `PARENT:` | map_id,x,y | Where EXIT tiles lead |
+
+### Tile Characters
+
+| Char | Code | Meaning | Color |
+|------|------|---------|-------|
+| `#` | 35 | Wall | White |
+| `.` | 46 | Floor | White |
+| `+` | 43 | Closed door | Yellow |
+| `'` | 39 | Open door | Yellow |
+| `X` | 88 | Locked door | Yellow |
+| `<` | 60 | Stairs up | White |
+| `>` | 62 | Stairs down | White |
+| `~` | 126 | Water (impassable) | Blue |
+| `^` | 94 | Trap | Red |
+| `*` | 42 | Chest | Yellow |
+| `!` | 33 | Item pickup | Magenta |
+| `$` | 36 | Gold pile | Yellow |
+| `M` | 77 | Monster spawn | Red |
+| `N` | 78 | NPC spawn | Cyan |
+| `S` | 83 | Shop | Cyan |
+| `I` | 73 | Inn | Cyan |
+
+---
+
+## Items (items.dnddat)
+
+```csv
+# TYPE: ITEM
+# id,name,type,slot,value,atk,def,mag,hp,mp,req_level,rarity
+ITEM,1,Rusty Sword,WEAPON,WEAPON,5,3,0,0,0,0,1,COMMON
+ITEM,2,Iron Sword,WEAPON,WEAPON,25,6,0,0,0,0,1,COMMON
+ITEM,3,Steel Sword,WEAPON,WEAPON,75,10,0,0,0,0,3,UNCOMMON
+ITEM,4,Flame Blade,WEAPON,WEAPON,200,14,0,4,0,0,6,RARE
+ITEM,5,Dagger,WEAPON,WEAPON,10,4,0,0,0,0,1,COMMON
+ITEM,6,Battle Axe,WEAPON,WEAPON,60,12,0,0,0,0,4,COMMON
+ITEM,7,Staff,WEAPON,WEAPON,30,2,0,8,0,10,1,COMMON
+ITEM,8,Mace,WEAPON,WEAPON,40,7,1,0,0,0,2,COMMON
+
+ITEM,10,Cloth Tunic,ARMOR,ARMOR,5,0,1,0,0,0,1,COMMON
+ITEM,11,Leather Armor,ARMOR,ARMOR,30,0,4,0,0,0,1,COMMON
+ITEM,12,Chain Mail,ARMOR,ARMOR,100,0,8,0,0,0,3,UNCOMMON
+ITEM,13,Plate Armor,ARMOR,ARMOR,300,0,14,0,10,0,6,RARE
+ITEM,14,Mage Robes,ARMOR,ARMOR,50,0,2,6,0,15,2,UNCOMMON
+
+ITEM,20,Wooden Shield,SHIELD,SHIELD,10,0,2,0,0,0,1,COMMON
+ITEM,21,Iron Shield,SHIELD,SHIELD,50,0,5,0,0,0,2,COMMON
+ITEM,22,Tower Shield,SHIELD,SHIELD,150,0,10,0,5,0,5,UNCOMMON
+
+ITEM,30,Leather Cap,HELMET,HELMET,8,0,1,0,0,0,1,COMMON
+ITEM,31,Iron Helm,HELMET,HELMET,40,0,3,0,0,0,2,COMMON
+ITEM,32,Wizard Hat,HELMET,HELMET,35,0,0,4,0,8,2,UNCOMMON
+
+ITEM,40,Copper Ring,RING,RING,15,1,0,0,0,0,1,COMMON
+ITEM,41,Silver Ring,RING,RING,50,2,1,1,0,0,3,UNCOMMON
+ITEM,42,Ring of Power,RING,RING,200,5,0,3,10,0,5,RARE
+
+ITEM,50,Wooden Pendant,AMULET,AMULET,10,0,0,1,0,5,1,COMMON
+ITEM,51,Silver Amulet,AMULET,AMULET,75,0,1,2,5,10,3,UNCOMMON
+
+ITEM,60,Health Potion,POTION,NONE,25,0,0,0,0,0,1,COMMON
+ITEM,61,Mana Potion,POTION,NONE,25,0,0,0,0,0,1,COMMON
+ITEM,62,Elixir,POTION,NONE,100,0,0,0,0,0,1,UNCOMMON
+ITEM,63,Antidote,POTION,NONE,15,0,0,0,0,0,1,COMMON
+
+ITEM,70,Rusty Key,KEY,NONE,0,0,0,0,0,0,1,COMMON
+ITEM,71,Iron Key,KEY,NONE,50,0,0,0,0,0,1,UNCOMMON
+ITEM,72,Master Key,KEY,NONE,200,0,0,0,0,0,1,RARE
+
+ITEM,80,Bread,FOOD,NONE,5,0,0,0,0,0,1,COMMON
+ITEM,81,Rations,FOOD,NONE,15,0,0,0,0,0,1,COMMON
+```
+
+### Item Types
+`WEAPON`, `ARMOR`, `SHIELD`, `HELMET`, `RING`, `AMULET`, `POTION`, `SCROLL`, `KEY`, `GOLD`, `FOOD`, `MISC`
+
+### Equipment Slots
+`WEAPON`, `ARMOR`, `SHIELD`, `HELMET`, `RING`, `AMULET`, `NONE`
+
+### Rarity Levels
+`COMMON`, `UNCOMMON`, `RARE`, `EPIC`, `LEGENDARY`
+
+---
+
+## Monsters (monsters.dnddat)
+
+```csv
+# id,name,symbol,hp,ac,damage_dice,damage_sides,damage_mod,xp,level
+MONSTER,1,Goblin,g,8,12,1,6,0,25,1
+MONSTER,2,Orc,o,15,13,1,8,1,50,2
+MONSTER,3,Troll,T,30,15,2,6,2,100,4
+MONSTER,10,Slime,s,5,8,1,4,0,10,1
+MONSTER,11,Skeleton,k,12,11,1,6,1,30,2
+MONSTER,12,Zombie,z,18,9,1,8,0,40,2
+MONSTER,20,Dragon,D,100,18,2,10,5,500,10
+MONSTER,21,Demon,&,80,17,2,8,4,400,9
+```
+
+### Damage Format
+`damage_dice d damage_sides + damage_mod`
+
+Example: `2,6,2` = 2d6+2 (4-14 damage)
+
+---
+
+## Character Classes (classes.dnddat)
+
+```csv
+# id,name,base_hp,base_mp,str,agi,vit,int,luk
+CLASS,1,Warrior,30,5,12,8,12,6,8
+CLASS,2,Mage,18,25,6,8,6,14,10
+CLASS,3,Rogue,22,12,8,14,8,8,12
+CLASS,4,Cleric,24,20,8,7,10,12,10
+CLASS,5,Ranger,25,15,10,12,9,8,10
+```
+
+---
+
+## Level Progression (level_gains.dnddat)
+
+Defines stat gains and skills learned per level per class.
+
+```csv
+# class_id,level,hp,mp,str,agi,vit,int,skill_id
+LEVEL,1,2,8,0,2,1,2,0,0
+LEVEL,1,3,10,1,2,1,2,0,2
+LEVEL,1,5,12,1,3,1,3,0,4
+LEVEL,2,2,5,4,1,1,0,2,10
+LEVEL,2,3,6,5,1,1,0,3,11
+```
+
+`skill_id = 0` means no skill learned at that level.
+
+---
+
+## Skills (skills.dnddat)
+
+```csv
+# id,name,type,target,mp_cost,power,accuracy
+SKILL,1,Attack,ATTACK,SINGLE_ENEMY,0,0,95
+SKILL,2,Power Strike,ATTACK,SINGLE_ENEMY,3,15,90
+SKILL,3,Cleave,ATTACK,ALL_ENEMIES,5,10,85
+SKILL,4,Berserk,BUFF,SELF,4,25,100
+SKILL,10,Fire,ATTACK,SINGLE_ENEMY,4,20,100
+SKILL,11,Blizzard,ATTACK,ALL_ENEMIES,8,15,95
+SKILL,12,Thunder,ATTACK,SINGLE_ENEMY,6,25,90
+SKILL,20,Heal,HEAL,SINGLE_ALLY,3,20,100
+SKILL,21,Cure,HEAL,SINGLE_ALLY,2,0,100
+SKILL,22,Heal All,HEAL,ALL_ALLIES,8,15,100
+SKILL,30,Backstab,ATTACK,SINGLE_ENEMY,3,25,85
+SKILL,31,Steal,UTILITY,SINGLE_ENEMY,0,0,60
+SKILL,40,Aim,BUFF,SELF,2,20,100
+SKILL,41,Multi-Shot,ATTACK,ALL_ENEMIES,5,12,80
+```
+
+### Skill Types
+`ATTACK`, `HEAL`, `BUFF`, `DEBUFF`, `UTILITY`, `PASSIVE`
+
+### Targets
+`SELF`, `SINGLE_ENEMY`, `ALL_ENEMIES`, `SINGLE_ALLY`, `ALL_ALLIES`
+
+---
+
+## Shops (shops.dnddat)
+
+```csv
+# SHOP: id,name,buy_rate,sell_rate,map_id,x,y,type
+SHOP,0,General Store,120,50,1,14,4,GENERAL
+SHOP,1,Weapon Smithy,100,40,1,4,4,WEAPON
+SHOP,2,Armory,100,40,1,8,4,ARMOR
+SHOP,3,Court Wizard,150,60,4,5,5,MAGIC
+
+# STOCK: shop_id,item_id,quantity,restock_rate
+STOCK,0,60,10,50
+STOCK,0,61,10,50
+STOCK,0,80,255,0
+STOCK,1,1,255,0
+STOCK,1,2,5,20
+STOCK,1,5,10,50
+```
+
+### Price Rates
+- `buy_rate`: % of base price (100 = normal, 120 = 20% markup)
+- `sell_rate`: % of value player receives (50 = half price)
+
+### Stock
+- `quantity`: 255 = unlimited
+- `restock_rate`: % chance to restock per game day (0 = never)
+
+---
+
+## Inns (inns.dnddat)
+
+```csv
+# id,name,price,map_id,x,y,save_enabled
+INN,0,Cozy Hearth Inn,10,1,4,3,1
+INN,1,Castle Guest Room,0,4,8,8,1
+INN,2,Roadside Camp,5,0,25,10,0
+```
+
+`save_enabled`: 1 = can save here, 0 = rest only
+
+---
+
+## Encounter Zones (encounters.dnddat)
+
+```csv
+# ZONE: id,name,map_id,min_x,min_y,max_x,max_y,rate
+ZONE,0,Fields,0,5,8,15,15,8
+ZONE,1,Wilderness,0,16,0,39,24,12
+ZONE,2,Cave B1,2,0,0,29,19,15
+ZONE,3,Cave B2,3,0,0,29,19,20
+
+# GROUP: zone_id,monster_id,min_count,max_count,weight
+GROUP,0,1,1,2,50
+GROUP,0,1,3,4,20
+GROUP,1,1,2,3,30
+GROUP,1,2,1,2,50
+GROUP,2,1,2,4,40
+GROUP,2,2,1,2,50
+GROUP,2,3,1,1,10
+```
+
+### Rate
+Percentage chance of encounter per step (5-15% recommended, higher in dungeons)
+
+### Weight
+Relative probability of spawning this group. Higher = more common.
+
+---
+
+## World/Portals (world.dnddat)
+
+```csv
+# MAP: id,name,path,type,parent_id
+MAP,0,Overworld,maps/overworld.dndmap,OVERWORLD,0
+MAP,1,Hometown,maps/hometown.dndmap,TOWN,0
+MAP,2,Dark Cave B1,maps/cave_b1.dndmap,DUNGEON,0
+MAP,3,Dark Cave B2,maps/cave_b2.dndmap,DUNGEON,2
+
+# PORTAL: map_id,src_x,src_y,type,dest_map,dest_x,dest_y
+PORTAL,0,10,10,ENTRANCE,1,5,14
+PORTAL,1,5,15,EXIT,0,10,11
+PORTAL,0,25,5,ENTRANCE,2,3,3
+PORTAL,2,3,3,EXIT,0,25,5
+PORTAL,2,15,10,STAIRS_DOWN,3,3,3
+PORTAL,3,3,3,STAIRS_UP,2,15,10
+```
+
+### Portal Types
+`STAIRS_DOWN`, `STAIRS_UP`, `DOOR`, `ENTRANCE`, `EXIT`
+
+---
+
+## Save Files (.dndsav)
+
+Human-readable INI format. Auto-generated by the engine.
+
+```ini
+[HEADER]
+VERSION=1
+SLOT=0
+PLAYTIME=7245
+
+[WORLD]
+MAP_ID=2
+PLAYER_X=15
+PLAYER_Y=8
+INN_MAP=1
+INN_X=4
+INN_Y=3
+
+[PARTY]
+COUNT=2
+GOLD=1250
+
+[CHAR:0]
+NAME=Aldric
+CLASS=1
+LEVEL=7
+XP=2450
+HP=45
+MAX_HP=52
+MP=12
+MAX_MP=20
+STR=18
+AGI=12
+VIT=15
+INT=10
+LUK=11
+SKILLS=7
+
+[CHAR:1]
+NAME=Lyra
+CLASS=2
+LEVEL=6
+...
+
+[INVENTORY]
+COUNT=8
+ITEM_0=60,5
+ITEM_1=61,3
+...
+
+[EQUIPMENT]
+SLOT_0=3
+SLOT_1=12
+...
+
+[FLAGS]
+COUNT=4
+quest_dragon=1
+met_king=1
+cave_unlocked=1
+rescued_villager=0
+
+[CHECKSUM]
+VALUE=48291573
+```
+
+---
+
+## Creating a Mod
+
+1. Create folder: `mods/my_adventure/`
+
+2. Add your files:
+```
+mods/my_adventure/
+├── mod.dnddat
+├── items.dnddat
+├── monsters.dnddat
+├── maps/
+│   ├── start.dndmap
+│   └── dungeon.dndmap
+└── encounters.dnddat
+```
+
+3. Create `mod.dnddat`:
+```csv
+NAME,My Adventure
+AUTHOR,Your Name
+VERSION,1.0
+DESCRIPTION,A new quest in a distant land
+
+LOAD,mods/my_adventure/items.dnddat
+LOAD,mods/my_adventure/monsters.dnddat
+LOAD,mods/my_adventure/encounters.dnddat
+```
+
+---
+
+## Tips for Content Creators
+
+| Area | Tip |
+|------|-----|
+| **IDs** | Use 1000+ for mod content to avoid conflicts |
+| **Balance** | Test XP/gold values against progression |
+| **Maps** | Keep under 80x40 for performance |
+| **Encounters** | Rate 5-15% feels good; higher in dungeons |
+| **Economy** | sell_rate 40-50% prevents gold exploits |
+| **Difficulty** | Start zones with 1-2 weak enemies, scale up |
+| **Pacing** | New equipment every 2-3 levels feels rewarding |
