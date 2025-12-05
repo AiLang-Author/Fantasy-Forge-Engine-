@@ -1,0 +1,456 @@
+# Fantasy Forge Engine - Network Architecture
+
+## Overview
+
+The engine supports two modes:
+1. **Local Mode** — Single player, direct terminal
+2. **Server Mode** — Multiplayer MUD via telnet (planned)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      SERVER MODE                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────────┐                                          │
+│   │   Server    │◄─── Port 2323 (configurable)             │
+│   │   Process   │                                          │
+│   └──────┬──────┘                                          │
+│          │                                                  │
+│          ▼                                                  │
+│   ┌─────────────────────────────────────────┐              │
+│   │         Connection Manager              │              │
+│   │  • Accept new connections               │              │
+│   │  • Track active sessions                │              │
+│   │  • Handle disconnects                   │              │
+│   └──────┬──────────────┬───────────┬──────┘              │
+│          │              │           │                      │
+│          ▼              ▼           ▼                      │
+│   ┌──────────┐   ┌──────────┐   ┌──────────┐             │
+│   │ Session  │   │ Session  │   │ Session  │  ...        │
+│   │    1     │   │    2     │   │    3     │             │
+│   └────┬─────┘   └────┬─────┘   └────┬─────┘             │
+│        │              │              │                     │
+│        ▼              ▼              ▼                     │
+│   ┌──────────────────────────────────────────┐            │
+│   │            Shared World State            │            │
+│   │  • Maps, NPCs, Monsters                  │            │
+│   │  • Per-player: Position, Stats, Inv      │            │
+│   │  • Global: Flags, Economy                │            │
+│   └──────────────────────────────────────────┘            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Why Telnet?
+
+Telnet is ideal for this engine because:
+- **Text-based** — Matches our TUI rendering
+- **Universal** — Every OS has a telnet client
+- **Simple** — Easy to implement in AILang
+- **Classic** — MUD heritage, familiar to target audience
+
+The existing TUI escape codes work over telnet:
+```
+\x1b[H     — Home cursor
+\x1b[2J    — Clear screen
+\x1b[31m   — Red text
+\x1b[1m    — Bold
+\x1b[0m    — Reset
+```
+
+Most modern terminals (PuTTY, iTerm, Linux terminal, Windows Terminal) handle these correctly.
+
+---
+
+## Connection Flow
+
+```
+1. Client connects to server:port
+2. Server sends: IAC WILL ECHO, IAC WILL SGA (telnet negotiation)
+3. Server sends: Welcome banner / MOTD
+4. Client sends: Character name
+5. Server: Login or character creation flow
+6. Main game loop begins
+7. Server sends screen updates, client sends input
+```
+
+---
+
+## Library.Network (Planned)
+
+```ailang
+// ============================================
+// Library.Network.ailang
+// Telnet Server for Multiplayer
+// ============================================
+
+FixedPool.Net_Config {
+    "port": Initialize=2323
+    "max_connections": Initialize=32
+    "timeout": Initialize=300        // 5 min idle timeout
+    "motd_enabled": Initialize=1
+}
+
+// Session structure (512 bytes per connection)
+FixedPool.Session_Offsets {
+    "SOCKET": Initialize=0           // 4 bytes - socket FD
+    "STATE": Initialize=4            // 1 byte - connection state
+    "PLAYER_ID": Initialize=5        // 4 bytes - linked player
+    "LAST_ACTIVE": Initialize=9      // 4 bytes - timestamp
+    "INPUT_BUF": Initialize=13       // 256 bytes - input buffer
+    "INPUT_LEN": Initialize=269      // 2 bytes - buffer length
+    "OUTPUT_BUF": Initialize=271     // 256 bytes - output buffer
+    "SIZE": Initialize=512
+}
+
+// Connection states
+FixedPool.Session_States {
+    "NEW": Initialize=0              // Just connected
+    "LOGIN": Initialize=1            // Entering credentials
+    "CREATING": Initialize=2         // New character
+    "PLAYING": Initialize=3          // In-game
+    "COMBAT": Initialize=4           // In battle
+    "MENU": Initialize=5             // Shop/inn/dialogue
+    "LINKDEAD": Initialize=6         // Disconnected, char persists
+}
+
+// Server state
+FixedPool.Server_State {
+    "listen_fd": Initialize=0
+    "sessions": Initialize=0         // Session array
+    "session_count": Initialize=0
+    "running": Initialize=0
+}
+```
+
+### Key Functions (Planned)
+
+```ailang
+// Server lifecycle
+Net_StartServer(port) → Integer      // Start listening
+Net_StopServer()                     // Shutdown
+Net_ServerLoop()                     // Main poll loop
+
+// Session management
+Net_AcceptConnection() → Integer     // Accept new client
+Net_CloseSession(session_id)         // Disconnect client
+Net_GetSessionCount() → Integer      // Active sessions
+
+// I/O
+Net_SendToSession(session_id, text)  // Send to one client
+Net_SendToAll(text)                  // Broadcast
+Net_SendToMap(map_id, text)          // Send to players on map
+Net_ReadInput(session_id) → Address  // Get buffered input
+
+// Player linkage
+Net_LinkPlayer(session_id, player_id)
+Net_GetSessionPlayer(session_id) → Integer
+Net_GetPlayerSession(player_id) → Integer
+```
+
+---
+
+## Session Management
+
+### Player States
+
+```
+NEW        → Just connected, show MOTD
+LOGIN      → Entering name/password
+CREATING   → New character creation
+PLAYING    → Normal gameplay
+COMBAT     → In battle (restricted input)
+MENU       → In shop/inn/dialogue
+LINKDEAD   → Disconnected, character persists briefly
+```
+
+### Shared vs Per-Player Data
+
+**Shared (Server Authority):**
+- Map layouts and tiles
+- NPC positions and dialogue trees
+- Shop inventories and prices
+- Monster spawns (static positions)
+- Global quest flags
+- World time / day count
+
+**Per-Player:**
+- Character data (stats, level, XP)
+- Inventory and equipment
+- Position (map_id, x, y)
+- Personal quest flags
+- Session state
+- Gold
+
+---
+
+## Multiplayer Modes
+
+### Mode 1: Parallel Worlds (Easiest)
+
+Each player gets their own instance. Players can chat but don't interact with each other's world.
+
+```
+Player A: [Overworld 15,10] Fighting goblin
+Player B: [Overworld 15,10] No goblin (different instance)
+```
+
+**Pros:** Simple, no sync issues
+**Cons:** Not truly multiplayer
+
+### Mode 2: Shared World (Medium)
+
+All players see the same world. Monsters respawn on timers.
+
+```
+Player A kills goblin at (15,10)
+→ Goblin gone for everyone
+→ Timer: Respawns after 60 seconds
+```
+
+**Pros:** Feel of shared adventure
+**Cons:** Race conditions, kill stealing
+
+### Mode 3: Party System (Advanced)
+
+Players can group up, share XP, coordinate combat.
+
+```
+/party invite PlayerB
+/party accept
+→ Now see each other on map
+→ Enter same battles
+→ Share XP proportionally
+```
+
+**Pros:** True co-op experience
+**Cons:** Complex sync, combat turn order
+
+---
+
+## Chat System
+
+```
+/say Hello!           → Local area chat (same map)
+/shout HELLO!         → Server-wide announcement
+/tell PlayerB Hi      → Private message
+/party Hey team       → Party-only chat
+/who                  → List online players
+/party invite Name    → Party management
+/party leave          → Leave party
+/quit                 → Disconnect gracefully
+```
+
+### Chat Display
+
+```
+[Local] PlayerA: Hello!
+[Shout] PlayerB: HELP IN CAVE!
+[Tell] From PlayerC: Got any potions?
+[Party] PlayerD: Ready to fight boss?
+```
+
+---
+
+## Server Configuration
+
+`server.dnddat`:
+
+```ini
+[SERVER]
+PORT=2323
+MAX_PLAYERS=32
+TIMEOUT=300
+MOTD_FILE=data/motd.txt
+
+[WORLD]
+MODE=SHARED
+RESPAWN_TIME=60
+PVP_ENABLED=0
+PARTY_MAX_SIZE=4
+
+[SAVES]
+AUTO_SAVE=1
+SAVE_INTERVAL=300
+SAVE_PATH=saves/
+
+[ADMIN]
+ADMIN_PASSWORD=changeme
+LOG_FILE=logs/server.log
+LOG_LEVEL=INFO
+```
+
+---
+
+## Security Considerations
+
+### Input Validation
+
+```ailang
+// Max input length
+IfCondition GreaterThan(input_len, 256) ThenBlock: {
+    input_len = 256
+}
+
+// Strip control characters (except escape for arrow keys)
+i = 0
+WhileLoop LessThan(i, input_len) {
+    ch = GetByte(input, i)
+    IfCondition And(LessThan(ch, 32), NotEqual(ch, 27)) ThenBlock: {
+        SetByte(input, i, 32)  // Replace with space
+    }
+    i = Add(i, 1)
+}
+
+// Rate limit commands (1 per 100ms)
+IfCondition LessThan(Subtract(now, last_command), 100) ThenBlock: {
+    ReturnValue(-1)  // Too fast
+}
+```
+
+### Authentication
+
+```ailang
+// Simple password hash (XOR-based, not cryptographically secure)
+// For real security, use external auth or proper hashing
+Function.Net_HashPassword {
+    Input: password: Address
+    Output: Integer
+    Body: {
+        hash = 5381
+        i = 0
+        WhileLoop NotEqual(GetByte(password, i), 0) {
+            ch = GetByte(password, i)
+            hash = Add(Multiply(hash, 33), ch)
+            i = Add(i, 1)
+        }
+        ReturnValue(hash)
+    }
+}
+
+// Lockout after 3 failed attempts
+IfCondition GreaterEqual(failed_attempts, 3) ThenBlock: {
+    Net_SendToSession(session, "Too many failed attempts. Try again later.")
+    Net_CloseSession(session)
+}
+```
+
+### Anti-Cheat
+
+- **Server-authoritative:** Client sends commands, server validates and executes
+- **Movement validation:** Check distance per tick, prevent teleporting
+- **Action rate limiting:** Prevent attack spam
+- **Stat validation:** Server recalculates derived stats, ignores client values
+
+---
+
+## Implementation Phases
+
+### Phase 1: Basic Telnet
+- [ ] Socket creation and binding
+- [ ] Accept single connection
+- [ ] Send/receive text
+- [ ] Single player over network
+
+### Phase 2: Multi-Session
+- [ ] Poll-based multiplexing
+- [ ] Multiple simultaneous connections
+- [ ] Session state machine
+- [ ] Basic chat (`/say`, `/who`)
+
+### Phase 3: Shared World
+- [ ] Broadcast position updates
+- [ ] See other players on map
+- [ ] Monster respawn system
+- [ ] Shared quest flags
+
+### Phase 4: Party System
+- [ ] Party creation and invites
+- [ ] Shared combat encounters
+- [ ] XP distribution
+- [ ] Party chat
+
+### Phase 5: DM Mode
+- [ ] Admin authentication
+- [ ] God commands (`/spawn`, `/teleport`, `/give`)
+- [ ] Real-time world editing
+- [ ] Session logging
+
+---
+
+## WebSocket Alternative
+
+For browser-based play:
+
+```
+Browser ←→ WebSocket ←→ AILang Server ←→ Game Engine
+```
+
+Would require:
+- HTTP upgrade handshake
+- WebSocket frame parsing
+- JSON output mode for game state
+- rot.js or Canvas renderer on client
+
+**Benefits:**
+- Play in any browser
+- No client install
+- Mobile friendly
+- Modern UI possible
+
+---
+
+## Running the Server
+
+```bash
+# Compile with network support
+cd Fantasy-Forge-Engine-/dnd/ailang
+python3 ../../AiLang/ailang/main.py dnd_server.ailang
+
+# Start server
+./dnd_server_exec --port 2323 --config server.dnddat
+
+# Connect with telnet
+telnet localhost 2323
+
+# Or netcat
+nc localhost 2323
+
+# Or PuTTY (Windows)
+# Connection type: Raw, Host: localhost, Port: 2323
+```
+
+---
+
+## D&D Campaign Support
+
+For tabletop groups using this as a virtual tabletop:
+
+### DM Mode Commands
+
+```
+/dm spawn goblin 15 10      → Spawn monster at position
+/dm teleport PlayerA 5 5    → Move player
+/dm give PlayerA 60 5       → Give items
+/dm flag quest_dragon 1     → Set quest flag
+/dm heal PlayerA            → Full heal
+/dm kill goblin_1           → Remove monster
+/dm say The door creaks...  → Narrator text
+```
+
+### Roll Integration
+
+```
+/roll 1d20+5     → You rolled 17 (12+5)
+/roll 4d6        → You rolled 14 (3+4+4+3)
+/roll 2d6+1d8    → You rolled 15 (5+4+6)
+```
+
+### Session Features
+
+- **Auto-transcript:** All chat saved to `logs/session_YYYYMMDD.txt`
+- **Combat log:** Detailed damage/healing for review
+- **Map reveal:** Fog of war with DM reveal commands
+- **Pause:** DM can pause game for discussion
