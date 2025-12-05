@@ -1,0 +1,248 @@
+# Fantasy Forge Engine - Project Roadmap
+
+## Vision
+
+An open-source, fully moddable, Dragon Quest-style RPG engine written in AILang that compiles to native code. Designed for hobbyist game developers, D&D groups wanting virtual adventures, retro gaming enthusiasts, and AILang learners.
+
+---
+
+## Current Status: v0.1 (Core Complete)
+
+### ✅ Completed Libraries
+
+| Library | Status | Description |
+|---------|--------|-------------|
+| `Library.TUI` | ✅ Done | Terminal UI with ANSI colors, raw mode input |
+| `Library.DICE` | ✅ Done | RNG, dice rolls (NdS+M), advantage/disadvantage |
+| `Library.CSV` | ✅ Done | RFC 4180 parser for data files |
+| `Library.Character` | ✅ Done | Classes, stats, skills, leveling, XP tables |
+| `Library.Item` | ✅ Done | Items, inventory (20 slots), equipment (6 slots) |
+| `Library.DND` | ✅ Done | Game loop, maps, movement, collision |
+| `Library.World` | ✅ Done | Map transitions, portal system |
+| `Library.GameConfig` | ✅ Done | .dndconf parser, world setup |
+| `Library.Save` | ✅ Done | Multi-slot saves, party support, quest flags |
+| `Library.SaveScreen` | ✅ Done | Save/load UI with slot preview |
+| `Library.Shop` | ✅ Done | Buy/sell, stock management, pricing |
+| `Library.Inn` | ✅ Done | Rest, heal, save checkpoints, respawn |
+| `Library.Encounter` | ✅ Done | Random battles, zone-based, weighted groups |
+| `Library.BattleScreen` | ✅ Done | Turn-based combat UI |
+| `Library.EquipScreen` | ✅ Done | Equipment management UI |
+
+### ✅ Data Formats Defined
+
+| Format | Purpose |
+|--------|---------|
+| `.dndconf` | World configuration |
+| `.dndmap` | ASCII map layouts with metadata |
+| `.dnddat` | CSV-like data tables |
+| `.dndsav` | INI-like save format with checksum |
+| `.dndscript` | Dialogue scripts (spec complete, parser TODO) |
+
+### ✅ Core Features Working
+
+- Character creation with 5 classes
+- Turn-based d20-style combat
+- Random encounters by zone
+- Shop buy/sell with stock
+- Inn rest and save checkpoints
+- Death respawn with gold penalty
+- Multi-slot saves (3 slots)
+- Party support (up to 4 characters)
+- Quest flag persistence
+- Map transitions via portals
+
+---
+
+## Roadmap
+
+### Phase 1: Polish & Integration (Current)
+
+**Goal:** Stabilize core gameplay loop, fix bugs, balance.
+
+- [ ] Full integration test of all libraries
+- [ ] Battle system edge cases (multi-enemy, skills)
+- [ ] Shop restock on day advance
+- [ ] Balance pass on XP/gold curves
+- [ ] Documentation updates
+- [ ] Demo world with complete content
+
+**Estimated:** 2-4 weeks
+
+---
+
+### Phase 2: NPCs & Story
+
+**Goal:** Add NPC interactions and quest system.
+
+| Task | Priority | Notes |
+|------|----------|-------|
+| `Library.NPC` | High | Spawns, movement patterns, collision |
+| `Library.Dialogue` | High | .dndscript parser and executor |
+| Quest flag conditions | High | CHECK command in dialogue |
+| NPC shops | Medium | Talk to buy (vs tile-based) |
+| NPC schedules | Low | Time-based NPC positions |
+
+**New data files:**
+- `npcs.dnddat` — NPC definitions
+- `dialogues.dndscript` — Conversation trees
+
+**Estimated:** 4-6 weeks
+
+---
+
+### Phase 3: Combat Depth
+
+**Goal:** Richer battle mechanics.
+
+| Task | Priority |
+|------|----------|
+| Status effects (poison, stun, etc) | High |
+| Elemental damage types | Medium |
+| Multi-target skills | Medium |
+| Battle item usage | High |
+| Enemy AI improvements | Medium |
+| Boss battles with phases | Low |
+
+**Estimated:** 3-4 weeks
+
+---
+
+### Phase 4: Visual Polish
+
+**Goal:** Better presentation.
+
+| Task | Priority |
+|------|----------|
+| Tile palette system (forest, desert, snow) | Medium |
+| Character/monster sprites via JSON | Medium |
+| Combat animations (attack, hit, death) | Low |
+| Title screen art | Low |
+| Sound effects (terminal bell or external) | Low |
+
+**Estimated:** 4-6 weeks
+
+---
+
+### Phase 5: Multiplayer (MUD-Style)
+
+**Goal:** Shared world over network.
+
+| Task | Priority |
+|------|----------|
+| `Library.Network` — Socket handling | High |
+| Telnet server (basic single-player over net) | High |
+| Multi-session management | High |
+| Basic chat (`/say`, `/shout`, `/tell`) | High |
+| Shared world mode (see other players) | Medium |
+| Party system (invite, share XP) | Medium |
+| Monster respawn timers | Medium |
+| PvP (optional toggle) | Low |
+| DM mode (admin commands, live editing) | Low |
+
+**New files:**
+- `server.dnddat` — Server configuration
+- `motd.txt` — Message of the day
+
+**Estimated:** 8-12 weeks
+
+---
+
+### Phase 6: Browser Support
+
+**Goal:** Play in web browser.
+
+| Task | Priority |
+|------|----------|
+| WebSocket server wrapper | High |
+| JSON output mode for state | High |
+| rot.js or Canvas renderer | Medium |
+| Mobile-friendly controls | Low |
+
+**Estimated:** 6-8 weeks
+
+---
+
+## Technical Debt
+
+Items to address during development:
+
+| Issue | Severity | Notes |
+|-------|----------|-------|
+| Magic numbers in offsets | Low | Replace with constants |
+| Error handling consistency | Medium | Standardize return codes |
+| Memory leak auditing | Medium | Long session testing |
+| CSV parser edge cases | Low | Quoted fields, escapes |
+| Test coverage | Medium | Add test data files |
+
+---
+
+## Contributing Guidelines
+
+### For Code Changes
+
+1. Open an issue first for major features
+2. Follow existing code style (see source files)
+3. Test with existing save files
+4. Update documentation
+
+### For Content/Mods
+
+1. Use IDs 1000+ to avoid conflicts
+2. Test balance with progression curve
+3. Document new file formats
+4. Submit as standalone mod first
+
+### Priority Focus
+
+1. **Stability** — Core gameplay must be solid
+2. **Data-driven** — Prefer data files over code changes
+3. **Documentation** — Every feature needs docs
+4. **Backwards compatibility** — Don't break save files
+
+---
+
+## Project Structure
+
+```
+Fantasy-Forge-Engine-/
+└── dnd/
+    └── ailang/
+        ├── dnd.ailang              # Entry point
+        ├── Library.*.ailang        # All libraries
+        ├── data/
+        │   ├── game.dndconf        # Demo world
+        │   ├── *.dnddat            # Data tables
+        │   └── scripts/            # Dialogue (TODO)
+        ├── maps/
+        │   └── *.dndmap            # Map files
+        ├── saves/
+        │   └── *.dndsav            # Save files
+        ├── mods/                   # User mods
+        └── docs/
+            ├── ONBOARDING.md
+            ├── DATA_FORMATS.md
+            ├── LIBRARY_REFERENCE.md
+            ├── NETWORK_ARCHITECTURE.md
+            └── PROJECT_ROADMAP.md
+```
+
+---
+
+## Version History
+
+| Version | Date | Highlights |
+|---------|------|------------|
+| v0.1 | Current | Core engine complete |
+| v0.2 | Planned | NPCs and dialogue |
+| v0.3 | Planned | Combat depth |
+| v0.4 | Planned | Visual polish |
+| v0.5 | Planned | Multiplayer alpha |
+| v1.0 | Goal | Feature complete |
+
+---
+
+## Links
+
+- [AILang Compiler](https://github.com/AiLang-Author/AiLang)
+- [Fantasy Forge Engine](https://github.com/AiLang-Author/Fantasy-Forge-Engine-)
+- [AILang Compiler Source](https://github.com/AiLang-Author/AiLang/tree/master/ailang)
