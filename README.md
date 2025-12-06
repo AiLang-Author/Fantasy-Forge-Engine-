@@ -1,7 +1,6 @@
 # Fantasy Forge Engine
 
-(https://github.com/AiLang-Author/Fantasy-Forge-Engine-/blob/main/dnd/ailang/assets/FFE%20Cover%20Pic.jpg)
-
+![Fantasy Forge Engine Cover](https://github.com/AiLang-Author/Fantasy-Forge-Engine-/raw/main/dnd/ailang/assets/FFE%20Cover%20Pic.jpg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub issues](https://img.shields.io/github/issues/AiLang-Author/Fantasy-Forge-Engine-)](https://github.com/AiLang-Author/Fantasy-Forge-Engine-/issues)
 [![GitHub stars](https://img.shields.io/github/stars/AiLang-Author/Fantasy-Forge-Engine-)](https://github.com/AiLang-Author/Fantasy-Forge-Engine-/stargazers)
