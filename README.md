@@ -174,6 +174,16 @@ Fantasy-Forge-Engine-/
         |   ├── SAVE_SYSTEM.md
         |   └── NETWORK_ARCHITECTURE.md
         |
+        ├── sprites/
+        │   ├── default/
+        │   │   ├── tileset.png        # 16x16 or 32x32 grid sprite sheet
+        │   │   ├── tileset.json       # Metadata mapping
+        │   │   └── preview.png        # Optional preview image
+        │   ├── kenney/                # Alternative theme
+        │   │   ├── tileset.png
+        │   │   └── tileset.json
+        │   └── sprites.md             # Documentation
+        |
         |___Librarys_
                     ├── Library.DND.ailang      # Core game engine
                     ├── Library.TUI.ailang      # Terminal rendering
