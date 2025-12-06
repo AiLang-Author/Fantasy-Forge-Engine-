@@ -38,7 +38,7 @@ A fully data-driven, open-source RPG engine inspired by Dragon Quest and tableto
 | **Economy** | Shops (buy/sell rates, restocking), inns (rest/save checkpoints) |
 | **Persistence** | 3 save slots, party support (up to 4), quest flags, checksum validation |
 | **Encounters** | Zone-based random battles with configurable rates and monster groups |
-| **Rendering** | Terminal TUI with ANSI colors, JSON output for browser integration |
+| **Rendering** | Terminal TUI with ANSI colors, JSON output for browser integration "in development" |
 
 ## Quick Start
 
