@@ -157,20 +157,6 @@ Fantasy-Forge-Engine-/
 └── dnd/
     └── ailang/
         ├── dnd.ailang              # Main entry point
-        ├── Library.DND.ailang      # Core game engine
-        ├── Library.TUI.ailang      # Terminal rendering
-        ├── Library.DICE.ailang     # RNG and dice rolls
-        ├── Library.Character.ailang
-        ├── Library.Item.ailang
-        ├── Library.Shop.ailang
-        ├── Library.Inn.ailang
-        ├── Library.Save.ailang
-        ├── Library.SaveScreen.ailang
-        ├── Library.World.ailang
-        ├── Library.GameConfig.ailang
-        ├── Library.Encounter.ailang
-        ├── Library.BattleScreen.ailang
-        ├── Library.EquipScreen.ailang
         ├── data/
         │   ├── game.dndconf        # Demo world config
         │   ├── items.dnddat
@@ -184,9 +170,26 @@ Fantasy-Forge-Engine-/
         │   └── dungeon1.dndmap
         ├── saves/
         └── docs/
-            ├── DATA_FORMATS.md
-            ├── SAVE_SYSTEM.md
-            └── NETWORK_ARCHITECTURE.md
+        |   ├── DATA_FORMATS.md
+        |   ├── SAVE_SYSTEM.md
+        |   └── NETWORK_ARCHITECTURE.md
+        |
+        |___Librarys_
+                    ├── Library.DND.ailang      # Core game engine
+                    ├── Library.TUI.ailang      # Terminal rendering
+                    ├── Library.DICE.ailang     # RNG and dice rolls
+                    ├── Library.Character.ailang
+                    ├── Library.Item.ailang
+                    ├── Library.Shop.ailang
+                    ├── Library.Inn.ailang
+                    ├── Library.Save.ailang
+                    ├── Library.SaveScreen.ailang
+                    ├── Library.World.ailang
+                    ├── Library.GameConfig.ailang
+                    ├── Library.Encounter.ailang
+                    ├── Library.BattleScreen.ailang
+                    ├── Library.EquipScreen.ailang    
+
 ```
 
 ## Roadmap
