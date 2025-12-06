@@ -1,0 +1,334 @@
+# Fantasy Forge Engine - Player Guide
+
+Welcome, adventurer! This guide will teach you everything you need to survive.
+
+---
+
+## Controls
+
+| Key | Action |
+|-----|--------|
+| `↑` `↓` `←` `→` | Move (or `h` `j` `k` `l` vim-style) |
+| `Enter` / `Space` | Interact / Confirm |
+| `Esc` | Cancel / Back |
+| `i` | Open Inventory |
+| `e` | Open Equipment |
+| `s` | Status / Stats |
+| `q` | Quit Game |
+
+### In Menus
+
+| Key | Action |
+|-----|--------|
+| `↑` `↓` | Navigate options |
+| `Enter` | Select |
+| `Esc` | Close menu |
+| `Tab` | Switch tabs (in shops) |
+
+### In Combat
+
+| Key | Action |
+|-----|--------|
+| `↑` `↓` | Select action |
+| `Enter` | Confirm action |
+| `←` `→` | Select target (if multiple) |
+
+---
+
+## Getting Started
+
+1. **Create your character** — Pick a name and class
+2. **Explore the town** — Talk to NPCs, find shops
+3. **Buy equipment** — Weapon and armor help a lot
+4. **Save at the inn** — This is your respawn point!
+5. **Venture out** — Fight monsters, gain XP, level up
+6. **Return to heal** — Don't push too far without healing
+
+**Golden rule:** Save early, save often. Death hurts.
+
+---
+
+## Character Classes
+
+| Class | HP | MP | Strengths | Weaknesses |
+|-------|----|----|-----------|------------|
+| **Warrior** | ★★★ | ★ | High damage, tanky | No magic |
+| **Mage** | ★ | ★★★ | Powerful spells, AoE | Fragile, needs MP |
+| **Rogue** | ★★ | ★★ | Fast, critical hits, steal | Lower defense |
+| **Cleric** | ★★ | ★★★ | Healing, buffs, undead killer | Weak damage |
+| **Ranger** | ★★ | ★★ | Balanced, multi-shot | Master of none |
+
+### Stat Breakdown
+
+| Stat | What It Does |
+|------|--------------|
+| **STR** | Physical damage |
+| **AGI** | Speed, dodge chance, escape success |
+| **VIT** | HP growth, defense |
+| **INT** | Magic damage, MP growth |
+| **LUK** | Critical hits, item drops |
+
+### Derived Stats
+
+| Stat | Formula |
+|------|---------|
+| **Attack** | STR + Weapon |
+| **Defense** | VIT/2 + Armor |
+| **Speed** | AGI (determines turn order) |
+| **Magic Atk** | INT |
+| **Magic Def** | INT/2 + VIT/4 |
+
+---
+
+## Combat
+
+Combat is turn-based. You and enemies take turns based on **Speed**.
+
+### Your Options
+
+| Action | Effect |
+|--------|--------|
+| **Attack** | Basic physical attack |
+| **Skill** | Use a learned ability (costs MP) |
+| **Defend** | Reduce damage taken this turn, +4 AC |
+| **Item** | Use a potion or consumable |
+| **Flee** | Attempt to escape (not always possible) |
+
+### How Attacks Work
+
+```
+Hit Check:    Roll d20 + your Attack vs enemy AC
+Damage:       Weapon dice + STR bonus
+Critical:     Natural 20 = double damage!
+```
+
+### Combat Tips
+
+- **Defend** when low HP and waiting for heals
+- **Flee** works better with high AGI (base 30% + AGI×2, max 90%)
+- Some zones prevent escape (boss fights, certain dungeons)
+- Dying respawns you at the last inn with **1 HP** and **half your gold**
+
+---
+
+## The World
+
+### Map Tiles
+
+| Symbol | Meaning |
+|--------|---------|
+| `@` | You |
+| `.` | Floor (walkable) |
+| `#` | Wall (blocked) |
+| `+` | Door (walk into to open) |
+| `X` | Locked door (need key) |
+| `<` | Stairs up |
+| `>` | Stairs down |
+| `~` | Water (blocked) |
+| `^` | Trap (damages you) |
+| `*` | Chest (walk into to open) |
+| `$` | Gold pile |
+| `!` | Item pickup |
+| `S` | Shop |
+| `I` | Inn |
+| `M` | Monster (visible spawn) |
+| `N` | NPC |
+
+### Map Types
+
+| Type | Encounters? | Description |
+|------|-------------|-------------|
+| **Town** | No | Safe zone, shops, inns, NPCs |
+| **Overworld** | Yes | Open travel between areas |
+| **Dungeon** | Yes | Monster-filled, loot-rich |
+| **Building** | No | Indoor areas, usually safe |
+
+---
+
+## Shops
+
+Walk onto an `S` tile and press Enter to open the shop.
+
+### Buying
+
+- Items cost gold (price shown)
+- Red price = you can't afford it
+- Some items have limited stock
+- Stock may refill over time (game days)
+
+### Selling
+
+- Press Tab to switch to Sell mode
+- You get ~40-50% of item value
+- Sell junk, keep good equipment
+
+### Shop Types
+
+| Type | What They Sell |
+|------|----------------|
+| **General** | Potions, food, basic supplies |
+| **Weapon** | Swords, axes, staves, daggers |
+| **Armor** | Body armor, shields, helmets |
+| **Magic** | Scrolls, wands, mage gear |
+
+---
+
+## Inns
+
+Walk onto an `I` tile and press Enter.
+
+### What Inns Do
+
+- **Rest** — Fully restore HP and MP (costs gold)
+- **Save** — Write your progress to a save slot
+- **Set Checkpoint** — If you die, you respawn here
+
+### Pro Tips
+
+- Always save before entering a new dungeon
+- Resting advances the game day (shops may restock)
+- Some inns are free (castle guest rooms, etc.)
+- You have **3 save slots** — use them!
+
+---
+
+## Inventory & Equipment
+
+### Inventory (press `i`)
+
+- Holds up to **20 item stacks**
+- Stackable items (potions, food) stack to 99
+- Use items directly from inventory
+
+### Equipment (press `e`)
+
+| Slot | What Goes There |
+|------|-----------------|
+| **Weapon** | Swords, axes, staves, daggers |
+| **Armor** | Body protection |
+| **Shield** | Off-hand defense |
+| **Helmet** | Head protection |
+| **Ring** | Stat bonuses |
+| **Amulet** | Stat bonuses |
+
+### Item Rarity
+
+| Color | Rarity | Quality |
+|-------|--------|---------|
+| White | Common | Basic |
+| Green | Uncommon | Decent |
+| Blue | Rare | Good |
+| Purple | Epic | Great |
+| Orange | Legendary | Best |
+
+---
+
+## Leveling Up
+
+Defeat monsters to earn **XP**. When you earn enough, you level up!
+
+### What You Get
+
+- Increased max HP and MP
+- Stat boosts (varies by class)
+- New skills at certain levels
+- Full HP/MP restore
+
+### XP Tips
+
+- Stronger monsters give more XP
+- Don't grind forever in starting areas
+- Push into harder zones as you level
+
+---
+
+## Skills
+
+Skills are special abilities learned as you level.
+
+### Skill Types
+
+| Type | Description |
+|------|-------------|
+| **Attack** | Deal damage (often with bonus effects) |
+| **Heal** | Restore HP to self or allies |
+| **Buff** | Increase stats temporarily |
+| **Debuff** | Weaken enemies |
+| **Utility** | Steal, scan, etc. |
+
+### MP Management
+
+- Skills cost MP
+- Blue potions restore MP
+- Some inns restore MP for free
+- Mages burn through MP fast—bring potions!
+
+---
+
+## Death
+
+When your HP hits 0:
+
+1. **Death screen** appears
+2. Choose: **Load Save**, **Respawn at Inn**, or **Quit**
+
+### Respawn Penalty
+
+- Teleport to last inn you saved at
+- HP set to **1** (heal up!)
+- Lose **half your gold**
+
+**Tip:** Bank your gold by buying items before dangerous dungeons.
+
+---
+
+## Quick Reference Card
+
+```
+┌────────────────────────────────────────────┐
+│           FANTASY FORGE QUICK REF          │
+├────────────────────────────────────────────┤
+│ MOVE:   Arrow keys or h/j/k/l              │
+│ MENU:   i=Inventory  e=Equipment  s=Stats  │
+│ ACTION: Enter=Interact/Confirm  Esc=Back   │
+├────────────────────────────────────────────┤
+│ COMBAT: Attack → Skill → Defend → Item     │
+│         Flee works better with high AGI    │
+├────────────────────────────────────────────┤
+│ SURVIVAL TIPS:                             │
+│ • Save at every inn                        │
+│ • Buy armor before weapons                 │
+│ • Don't hoard potions—use them             │
+│ • Flee if you're low, no shame             │
+│ • Death = 1 HP + half gold lost            │
+├────────────────────────────────────────────┤
+│ TILES:  . floor  # wall  + door  > stairs  │
+│         S shop   I inn   M monster         │
+└────────────────────────────────────────────┘
+```
+
+---
+
+## FAQ
+
+**Q: How do I save?**  
+A: Find an inn (`I` tile), interact, and choose Save.
+
+**Q: I'm stuck, enemies are too hard.**  
+A: Grind a bit in easier areas, buy better equipment, use potions.
+
+**Q: What does "Can't escape!" mean?**  
+A: Some battles (bosses, certain zones) don't allow fleeing.
+
+**Q: My inventory is full!**  
+A: Sell junk at shops or use consumables.
+
+**Q: Where do I go?**  
+A: Explore! Talk to NPCs. Look for stairs (`>` `<`) and doors (`+`).
+
+**Q: I died and lost all my gold!**  
+A: Only half. And that's why you save often. Lesson learned!
+
+---
+
+Good luck, adventurer. The realm needs heroes.
