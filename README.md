@@ -234,7 +234,7 @@ Fantasy-Forge-Engine-/
 |--------|--------|---------|
 | Binary size | < 250KB, could grow to 1mb or so with full features | ~221KB current binary  |
 | Idle CPU | < 1% | ~0% |
-| Memory (typical world) | < 1MB, will grow with larger map files|
+| Memory (typical world) | < 1MB, will grow with larger map files| 500kb current ram useage fulkl game engine running with 4 maps loaded  |
 | Map rendering | 60+ FPS | ✓ |
 
 Tested stable for 1+ hours continuous play with no memory growth.
