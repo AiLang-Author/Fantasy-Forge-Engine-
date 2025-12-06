@@ -234,7 +234,7 @@ Fantasy-Forge-Engine-/
 |--------|--------|---------|
 | Binary size | < 250KB | ~221KB |
 | Idle CPU | < 1% | ~0% |
-| Memory (typical world) | < 10MB | ~5MB |
+| Memory (typical world) | >1MB, will grow with large map files|
 | Map rendering | 60+ FPS | ✓ |
 
 Tested stable for 1+ hours continuous play with no memory growth.
