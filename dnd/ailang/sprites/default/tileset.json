@@ -1,0 +1,212 @@
+{
+  "name": "Default Fantasy",
+  "version": "1.0",
+  "author": "Fantasy Forge Team",
+  "license": "MIT",
+  "description": "Default tile set for Fantasy Forge Engine",
+  
+  "tileWidth": 16,
+  "tileHeight": 16,
+  "columns": 16,
+  "rows": 16,
+  "imageFile": "tileset.png",
+
+  "mapping": {
+    
+    "tiles": {
+      "#":  { "x": 0,  "y": 0, "name": "wall" },
+      ".":  { "x": 1,  "y": 0, "name": "floor" },
+      "+":  { "x": 2,  "y": 0, "name": "door_closed" },
+      "'":  { "x": 3,  "y": 0, "name": "door_open" },
+      "X":  { "x": 4,  "y": 0, "name": "door_locked" },
+      "<":  { "x": 5,  "y": 0, "name": "stairs_up" },
+      ">":  { "x": 6,  "y": 0, "name": "stairs_down" },
+      "~":  { "x": 7,  "y": 0, "name": "water", "animated": true, "frames": 2, "speed": 500 },
+      "^":  { "x": 9,  "y": 0, "name": "trap" },
+      "*":  { "x": 10, "y": 0, "name": "chest_closed" },
+      "C":  { "x": 11, "y": 0, "name": "chest_open" },
+      "$":  { "x": 12, "y": 0, "name": "gold" },
+      "!":  { "x": 13, "y": 0, "name": "item_pickup" },
+      " ":  { "x": 15, "y": 0, "name": "empty" }
+    },
+
+    "terrain_variants": {
+      "wall_top":       { "x": 0, "y": 1, "name": "wall_top" },
+      "wall_bottom":    { "x": 1, "y": 1, "name": "wall_bottom" },
+      "wall_left":      { "x": 2, "y": 1, "name": "wall_left" },
+      "wall_right":     { "x": 3, "y": 1, "name": "wall_right" },
+      "wall_corner_tl": { "x": 4, "y": 1, "name": "wall_corner_top_left" },
+      "wall_corner_tr": { "x": 5, "y": 1, "name": "wall_corner_top_right" },
+      "wall_corner_bl": { "x": 6, "y": 1, "name": "wall_corner_bottom_left" },
+      "wall_corner_br": { "x": 7, "y": 1, "name": "wall_corner_bottom_right" },
+      "floor_grass":    { "x": 8, "y": 1, "name": "grass" },
+      "floor_dirt":     { "x": 9, "y": 1, "name": "dirt" },
+      "floor_stone":    { "x": 10, "y": 1, "name": "stone_floor" },
+      "floor_wood":     { "x": 11, "y": 1, "name": "wood_floor" }
+    },
+
+    "objects": {
+      "@":  { "x": 0,  "y": 2, "name": "player" },
+      "S":  { "x": 1,  "y": 2, "name": "shop" },
+      "I":  { "x": 2,  "y": 2, "name": "inn" },
+      "O":  { "x": 3,  "y": 2, "name": "portal" },
+      "N":  { "x": 4,  "y": 2, "name": "npc_generic" },
+      "M":  { "x": 5,  "y": 2, "name": "monster_spawn" },
+      "F":  { "x": 6,  "y": 2, "name": "fountain" },
+      "T":  { "x": 7,  "y": 2, "name": "torch", "animated": true, "frames": 2, "speed": 300 },
+      "B":  { "x": 9,  "y": 2, "name": "barrel" },
+      "P":  { "x": 10, "y": 2, "name": "pillar" },
+      "A":  { "x": 11, "y": 2, "name": "altar" }
+    },
+
+    "monsters": {
+      "g":  { "x": 0,  "y": 3, "name": "goblin", "id": 1 },
+      "o":  { "x": 1,  "y": 3, "name": "orc", "id": 2 },
+      "t":  { "x": 2,  "y": 3, "name": "troll", "id": 3 },
+      "s":  { "x": 3,  "y": 3, "name": "slime", "id": 10 },
+      "k":  { "x": 4,  "y": 3, "name": "skeleton", "id": 11 },
+      "z":  { "x": 5,  "y": 3, "name": "zombie", "id": 12 },
+      "w":  { "x": 6,  "y": 3, "name": "wolf", "id": 13 },
+      "b":  { "x": 7,  "y": 3, "name": "bat", "id": 14 },
+      "r":  { "x": 8,  "y": 3, "name": "rat", "id": 15 },
+      "S":  { "x": 9,  "y": 3, "name": "spider", "id": 16 },
+      "G":  { "x": 10, "y": 3, "name": "ghost", "id": 17 },
+      "W":  { "x": 11, "y": 3, "name": "wraith", "id": 18 },
+      "O":  { "x": 12, "y": 3, "name": "ogre", "id": 19 },
+      "D":  { "x": 13, "y": 3, "name": "dragon", "id": 20 },
+      "&":  { "x": 14, "y": 3, "name": "demon", "id": 21 },
+      "L":  { "x": 15, "y": 3, "name": "lich", "id": 22 }
+    },
+
+    "npcs": {
+      "npc_king":      { "x": 0,  "y": 4, "name": "king", "symbol": "K" },
+      "npc_queen":     { "x": 1,  "y": 4, "name": "queen", "symbol": "Q" },
+      "npc_guard":     { "x": 2,  "y": 4, "name": "guard", "symbol": "G" },
+      "npc_villager":  { "x": 3,  "y": 4, "name": "villager", "symbol": "V" },
+      "npc_merchant":  { "x": 4,  "y": 4, "name": "merchant", "symbol": "M" },
+      "npc_blacksmith":{ "x": 5,  "y": 4, "name": "blacksmith", "symbol": "B" },
+      "npc_innkeeper": { "x": 6,  "y": 4, "name": "innkeeper", "symbol": "I" },
+      "npc_sage":      { "x": 7,  "y": 4, "name": "sage", "symbol": "W" },
+      "npc_priest":    { "x": 8,  "y": 4, "name": "priest", "symbol": "P" },
+      "npc_child":     { "x": 9,  "y": 4, "name": "child", "symbol": "c" },
+      "npc_elder":     { "x": 10, "y": 4, "name": "elder", "symbol": "E" },
+      "npc_knight":    { "x": 11, "y": 4, "name": "knight", "symbol": "K" }
+    },
+
+    "classes": {
+      "warrior": { "x": 0, "y": 5, "name": "warrior", "id": 1 },
+      "mage":    { "x": 1, "y": 5, "name": "mage", "id": 2 },
+      "rogue":   { "x": 2, "y": 5, "name": "rogue", "id": 3 },
+      "cleric":  { "x": 3, "y": 5, "name": "cleric", "id": 4 },
+      "ranger":  { "x": 4, "y": 5, "name": "ranger", "id": 5 }
+    },
+
+    "class_portraits": {
+      "warrior_portrait": { "x": 0, "y": 6, "name": "warrior_portrait", "id": 1 },
+      "mage_portrait":    { "x": 1, "y": 6, "name": "mage_portrait", "id": 2 },
+      "rogue_portrait":   { "x": 2, "y": 6, "name": "rogue_portrait", "id": 3 },
+      "cleric_portrait":  { "x": 3, "y": 6, "name": "cleric_portrait", "id": 4 },
+      "ranger_portrait":  { "x": 4, "y": 6, "name": "ranger_portrait", "id": 5 }
+    },
+
+    "items_weapons": {
+      "item_rusty_sword":  { "x": 0,  "y": 7, "name": "rusty_sword", "id": 1 },
+      "item_iron_sword":   { "x": 1,  "y": 7, "name": "iron_sword", "id": 2 },
+      "item_steel_sword":  { "x": 2,  "y": 7, "name": "steel_sword", "id": 3 },
+      "item_flame_blade":  { "x": 3,  "y": 7, "name": "flame_blade", "id": 4 },
+      "item_dagger":       { "x": 4,  "y": 7, "name": "dagger", "id": 5 },
+      "item_battle_axe":   { "x": 5,  "y": 7, "name": "battle_axe", "id": 6 },
+      "item_staff":        { "x": 6,  "y": 7, "name": "staff", "id": 7 },
+      "item_mace":         { "x": 7,  "y": 7, "name": "mace", "id": 8 },
+      "item_bow":          { "x": 8,  "y": 7, "name": "bow", "id": 9 }
+    },
+
+    "items_armor": {
+      "item_cloth_tunic":   { "x": 0,  "y": 8, "name": "cloth_tunic", "id": 10 },
+      "item_leather_armor": { "x": 1,  "y": 8, "name": "leather_armor", "id": 11 },
+      "item_chain_mail":    { "x": 2,  "y": 8, "name": "chain_mail", "id": 12 },
+      "item_plate_armor":   { "x": 3,  "y": 8, "name": "plate_armor", "id": 13 },
+      "item_mage_robes":    { "x": 4,  "y": 8, "name": "mage_robes", "id": 14 },
+      "item_wood_shield":   { "x": 5,  "y": 8, "name": "wooden_shield", "id": 20 },
+      "item_iron_shield":   { "x": 6,  "y": 8, "name": "iron_shield", "id": 21 },
+      "item_tower_shield":  { "x": 7,  "y": 8, "name": "tower_shield", "id": 22 },
+      "item_leather_cap":   { "x": 8,  "y": 8, "name": "leather_cap", "id": 30 },
+      "item_iron_helm":     { "x": 9,  "y": 8, "name": "iron_helm", "id": 31 },
+      "item_wizard_hat":    { "x": 10, "y": 8, "name": "wizard_hat", "id": 32 }
+    },
+
+    "items_accessories": {
+      "item_copper_ring":   { "x": 0, "y": 9, "name": "copper_ring", "id": 40 },
+      "item_silver_ring":   { "x": 1, "y": 9, "name": "silver_ring", "id": 41 },
+      "item_power_ring":    { "x": 2, "y": 9, "name": "ring_of_power", "id": 42 },
+      "item_wood_pendant":  { "x": 3, "y": 9, "name": "wooden_pendant", "id": 50 },
+      "item_silver_amulet": { "x": 4, "y": 9, "name": "silver_amulet", "id": 51 }
+    },
+
+    "items_consumables": {
+      "item_health_potion":  { "x": 0,  "y": 10, "name": "health_potion", "id": 60 },
+      "item_mana_potion":    { "x": 1,  "y": 10, "name": "mana_potion", "id": 61 },
+      "item_elixir":         { "x": 2,  "y": 10, "name": "elixir", "id": 62 },
+      "item_antidote":       { "x": 3,  "y": 10, "name": "antidote", "id": 63 },
+      "item_rusty_key":      { "x": 4,  "y": 10, "name": "rusty_key", "id": 70 },
+      "item_iron_key":       { "x": 5,  "y": 10, "name": "iron_key", "id": 71 },
+      "item_master_key":     { "x": 6,  "y": 10, "name": "master_key", "id": 72 },
+      "item_bread":          { "x": 7,  "y": 10, "name": "bread", "id": 80 },
+      "item_rations":        { "x": 8,  "y": 10, "name": "rations", "id": 81 },
+      "item_scroll":         { "x": 9,  "y": 10, "name": "scroll", "id": 90 }
+    },
+
+    "effects": {
+      "fx_hit":       { "x": 0, "y": 11, "name": "hit", "animated": true, "frames": 3, "speed": 100 },
+      "fx_miss":      { "x": 3, "y": 11, "name": "miss" },
+      "fx_critical":  { "x": 4, "y": 11, "name": "critical", "animated": true, "frames": 3, "speed": 80 },
+      "fx_heal":      { "x": 7, "y": 11, "name": "heal", "animated": true, "frames": 3, "speed": 150 },
+      "fx_fire":      { "x": 10, "y": 11, "name": "fire", "animated": true, "frames": 3, "speed": 100 },
+      "fx_ice":       { "x": 13, "y": 11, "name": "ice", "animated": true, "frames": 2, "speed": 120 }
+    },
+
+    "ui": {
+      "ui_cursor":        { "x": 0, "y": 12, "name": "cursor", "animated": true, "frames": 2, "speed": 500 },
+      "ui_select":        { "x": 2, "y": 12, "name": "selection" },
+      "ui_heart_full":    { "x": 3, "y": 12, "name": "heart_full" },
+      "ui_heart_half":    { "x": 4, "y": 12, "name": "heart_half" },
+      "ui_heart_empty":   { "x": 5, "y": 12, "name": "heart_empty" },
+      "ui_mana_full":     { "x": 6, "y": 12, "name": "mana_full" },
+      "ui_mana_empty":    { "x": 7, "y": 12, "name": "mana_empty" },
+      "ui_coin":          { "x": 8, "y": 12, "name": "coin" },
+      "ui_exp":           { "x": 9, "y": 12, "name": "exp_icon" },
+      "ui_level":         { "x": 10, "y": 12, "name": "level_icon" }
+    },
+
+    "status_icons": {
+      "status_poison":   { "x": 0, "y": 13, "name": "poisoned" },
+      "status_burn":     { "x": 1, "y": 13, "name": "burning" },
+      "status_freeze":   { "x": 2, "y": 13, "name": "frozen" },
+      "status_stun":     { "x": 3, "y": 13, "name": "stunned" },
+      "status_sleep":    { "x": 4, "y": 13, "name": "sleeping" },
+      "status_bless":    { "x": 5, "y": 13, "name": "blessed" },
+      "status_shield":   { "x": 6, "y": 13, "name": "shielded" },
+      "status_haste":    { "x": 7, "y": 13, "name": "hasted" },
+      "status_slow":     { "x": 8, "y": 13, "name": "slowed" }
+    }
+  },
+
+  "palettes": {
+    "day": {
+      "description": "Default daytime palette",
+      "tint": null
+    },
+    "night": {
+      "description": "Nighttime blue tint",
+      "tint": { "r": 100, "g": 100, "b": 180, "a": 0.3 }
+    },
+    "dungeon": {
+      "description": "Dark dungeon atmosphere",
+      "tint": { "r": 80, "g": 80, "b": 100, "a": 0.2 }
+    },
+    "cave": {
+      "description": "Cave brown/amber tint",
+      "tint": { "r": 150, "g": 120, "b": 80, "a": 0.15 }
+    }
+  }
+}
