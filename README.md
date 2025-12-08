@@ -1,3 +1,7 @@
+There is currently a bug in the compiled code that causes a crash at start up, i will fix it in the coming week. To all those watching the repo, my apologies. 
+---
+
+
 # Fantasy Forge Engine
 
 ![Fantasy Forge Engine Cover](https://github.com/AiLang-Author/Fantasy-Forge-Engine-/raw/main/dnd/ailang/assets/FFE%20Cover%20Pic.jpg)
