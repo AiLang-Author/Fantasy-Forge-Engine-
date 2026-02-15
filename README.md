@@ -1,4 +1,4 @@
-currently doing a refactor do to compiler development, new release soon as compiler stabilizes. 
+currently doing a refactor due to compiler development, new release soon as compiler stabilizes. 
 ---
 
 
