@@ -1,4 +1,4 @@
-There is currently a bug in the compiled code that causes a crash at start up, i will fix it in the coming week. To all those watching the repo, my apologies. 
+currently doing a refactor do to compiler development, new release soon as compiler stabilizes. 
 ---
 
 
