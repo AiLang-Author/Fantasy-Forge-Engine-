@@ -1,6 +1,4 @@
-currently doing a refactor due to compiler development, new release soon as compiler stabilizes. 
----
-
+# HUGE REFACTOR INCOMING, Complete rewrite. HTML and TUI rendering pathways and more working. New code landing SOON !!!! 4/23/2026 Status update.
 
 # Fantasy Forge Engine
 
